@@ -4,8 +4,8 @@ export default {
         state.items = companies
     },
 
-    SET_COMPANY_SELECTED (state,company) {
-        state.companySelected = company
+    SET_COMPANY_SELECTED (state, company) {
+           state.companySelected = Object.assign(state.companySelected, company)
 
     },
 

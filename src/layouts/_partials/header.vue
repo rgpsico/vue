@@ -11,12 +11,14 @@
           <ul class="navbar-nav ml-auto">
             <li class="nav-item nav-cart active">
               <router-link :to="{name:'cart'}" class="nav-link">
-                   <i class="fas fa-shopping-cart">3</i> 
+                   <i class="fas fa-shopping-cart">({{productsCart.length}})</i> 
               </router-link>
             </li>
-              <li class="nav-item active">
-                <router-link :to="{name:'login'}" class="nav-link">Entrar</router-link>
-
+              <li class="nav-item">
+                <router-link :to="{name:'my.orders'}"  v-if="me.name" class="nav-link">
+                    Olá {{me.name}}  (<span @click.prevent="logout">Sair</span>)
+                </router-link>
+                    <router-link v-else :to="{name:'login'}" class="nav-link">Entrar</router-link>
               </li>
        
           </ul>
@@ -25,3 +27,24 @@
     </nav>
   </header>
 </template>
+
+
+<script>
+import {mapState , mapActions} from 'vuex'
+export default {
+  computed: {
+    ...mapState({
+      productsCart:state => state.cart.products,
+      me: state => state.auth.me
+
+    })
+  },
+  methods: {
+    ...mapActions([
+      'logout'
+
+    ])
+
+  }
+}
+</script>

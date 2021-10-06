@@ -27,19 +27,23 @@ export default {
 
     },
 
-    getProductsByCompany ({commit}, token_company) {   
-        commit('SET_PRELOADER',true)
-        commit('SET_TEXT_PRELOADER','Carregando os Produtos')
-        commit('SET_PRODUCTS_COMPANY',{data:[]})
-        const params = {token_company}       
-        return axios.get(`${API_VERSION}/products`,
-        {params: {token_company}})
-        .then(response => commit('SET_PRODUCTS_COMPANY',response.data))
-        .finally(()    => commit('SET_PRELOADER',false))
+    getProductsByCompany ({ commit }, params) {
+        commit('SET_PRELOADER', true)
+        commit('SET_TEXT_PRELOADER', 'Carregando os produtos')
+        commit('SET_PRODUCTS_COMPANY', {data: []})
 
-     
+        return axios.get(`${API_VERSION}/products`, { params })
+                        .then(response => commit('SET_PRODUCTS_COMPANY', response.data))
+                        .finally(() => commit('SET_PRELOADER', false))
+    },
 
-        
-    }
+    getTableFromCompany ({commit}, params) {
+        commit('SET_PRELOADER', true)
+        commit('SET_TEXT_PRELOADER', 'Carregando a mesa')
+
+        return axios.get(`${API_VERSION}/tables/${params.table}`, { params })
+                        .then(response => commit('SET_TABLE_COMPANY', response.data.data))
+                        .finally(() => commit('SET_PRELOADER', false))
+    },
 
 }

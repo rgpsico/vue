@@ -7,15 +7,28 @@
 
         <div class="row my-4">
 
-          <div class="col-lg-4 col-md-4 col-6 mb-4" v-for="(company , index) 
-          in companies.data" :key>
+          <div class="col-lg-2 col-md-2 col-4 mb-2" v-for="(company , index) in companies.data" :key="index">
         
             <div class="restaurant-card">
                 <a href="#"  @click.prevent="goStoreCompany(company)">       
-                <img  
-                class="card-img-top" 
-               src="" alt="">
-              </a> 
+              <img 
+              v-if="company.image"
+              class="card-img-top"
+              :src="company.image"
+              :alt="company.name"
+               :height="80"
+               :width="80"
+              
+              >
+
+                <img v-else
+                  class="card-img-top"
+                  src="@/assets/imgs/vue-food.png"
+                  :alt="company.name"
+                   :height="80"
+               :width="80"
+                  >
+              </a>
                 <div class="restaurant-card-body">
                 <h3>
                <!-- <router-link 
