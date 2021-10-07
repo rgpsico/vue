@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "postinstall": "npm run build",
+    "start":"node server.js",
+    "install.clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run dev"
   },
   "dependencies": {
     "axios": "^0.21.4",
