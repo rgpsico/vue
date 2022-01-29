@@ -130,11 +130,17 @@ export default {
 }
 </script>
 <style scoped>
+
 @media screen and (min-width: 300px) {
   body {
     background-color: lightgreen;
   }
-  .modal-container{width:70%; margin-left: 50px;}
+  .modal-container{width:50%; width:40%; margin-left: 220px;}
+  .login{width:100%; text-transform: capitalize; margin-top:10px;}
+}
+
+@media screen and (min-width: 512px) { 
+  .modal-container{width:70%; margin-left: 50px; }
 }
 
 @media screen and (min-width: 800px) {
@@ -142,6 +148,6 @@ export default {
 }
 
 
-.login{margin-top:10px; height:50px; font-size:20px; text-transform: capitalize; font-weight: bold;}
+
 
 </style>
