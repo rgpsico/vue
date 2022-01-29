@@ -12,7 +12,9 @@
 
 
               </div>
-              <div class="px-md-5 my-4" v-else>
+
+              <div class="modal-container"  v-else>
+              <div class="px-md-5 my-4" >
                   <div class="col-12" v-if="me.name !== '' ">
                       <p><strong>Total de produtos: {{products.length}}</strong></p>
                            <p><strong>Preço total: {{totalCart}}</strong></p>
@@ -36,12 +38,12 @@
                           
                       </div>
                         <div class="col-6">
-                            <router-link  :to="{name: 'login'}" class="btn btn-dark btn-full">
+                            <router-link  :to="{name: 'login'}" class="btn btn-dark btn-full login">
                                     fazer login
                             </router-link>
                         </div>
                   </div>
-
+            </div>
               </div>
           </modal>
     </div>
@@ -127,3 +129,19 @@ export default {
     
 }
 </script>
+<style scoped>
+@media screen and (min-width: 300px) {
+  body {
+    background-color: lightgreen;
+  }
+  .modal-container{width:70%; margin-left: 50px;}
+}
+
+@media screen and (min-width: 800px) {
+  .modal-container{width:100%; padding:20px; margin-left:0;}
+}
+
+
+.login{margin-top:10px; height:50px; font-size:20px; text-transform: capitalize; font-weight: bold;}
+
+</style>
