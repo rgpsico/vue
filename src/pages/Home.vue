@@ -3,11 +3,11 @@
 
       <div class="col-lg-12">
 
-        <h1 class="my-4 title-tenant">Restaurantes</h1>
+        <h1 class="my-5 title-tenant">Restaurantes</h1>
 
         <div class="row my-4">
 
-          <div class="col-lg-2 col-md-2 col-4 mb-2" v-for="(company , index) in companies.data" :key="index">
+          <div class="col-lg-4 col-md-5 col-12 mb-4 ml-4" v-for="(company , index) in companies.data" :key="index">
         
             <div class="restaurant-card">
                 <a href="#"  @click.prevent="goStoreCompany(company)">       
@@ -16,7 +16,7 @@
               class="card-img-top"
               :src="company.image"
               :alt="company.name"
-               :height="80"
+               :height="300"
                :width="80"
               
               >
