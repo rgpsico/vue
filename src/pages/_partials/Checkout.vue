@@ -34,13 +34,21 @@
 
                                </textarea>
                            </div>
-                           <button class="btn btn-success btn-full"  @click.prevent="createOrder">Fazer Pedidos de forma anônima</button>
+                         
                           
                       </div>
                         <div class="col-6">
                             <router-link  :to="{name: 'login'}" class="btn btn-dark btn-full login">
                                     fazer login
                             </router-link>
+                        </div>
+                        <div class="col-6">
+                             <router-link  :to="{name: 'register'}" class="btn btn-danger btn-full " style="margin-top:10px;">
+                                    Cadastrar
+                            </router-link>
+                        </div>
+                        <div class="col-12 my-4">
+                              <button class="btn btn-success btn-full"  @click.prevent="createOrder"  v-if="me.name !== ''">Fazer Pedidos</button>
                         </div>
                   </div>
             </div>
