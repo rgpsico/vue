@@ -35,14 +35,10 @@
               {{errors.email[0] || '' }}
 
              </div>
-            <div class="input-group">
-              
-              <div class="input-group-append">
-                
-                <span class="input-group-text">
-                  <i class="fas fa-envelope"></i></span>
-               
-              </div>
+    <div class="input-group">              
+        <div class="input-group-append">
+            <span class="input-group-text"><i class="fas fa-envelope"></i></span>               
+         </div>
               
               <input 
               type="email" 
@@ -50,9 +46,53 @@
               name="email" 
               :class="['form-control', 'input_user', {'is-invalid' : errors.email != '' }]"
               value="" 
-              placeholder="E-mail">
+              placeholder="E-mail"> 
+            
+         
             </div>
 
+
+                <div class="input-group">              
+                      <div class="input-group-append">
+                          <span class="input-group-text"><i class="far fa-address-card"></i></span>               
+                      </div>              
+              <input 
+              type="text" 
+              v-model="formData.endereco" 
+              name="endereco" 
+              :class="['form-control', 'input_user', {'is-invalid' : errors.endereco != '' }]"
+              value="" 
+              placeholder="Local onde mora"> 
+            
+         
+            </div>
+
+
+        <div class="input-group">              
+          <div class="input-group-append">
+              <span class="input-group-text"><i class="fas fa-phone"></i></span>               
+          </div>              
+              <input 
+              type="text" 
+              v-model="formData.celular" 
+              name="celular" 
+              :class="['form-control', 'input_user', {'is-invalid' : errors.celular != '' }]"
+              value="" 
+              placeholder="Celular"> 
+          </div>
+
+          <div class="input-group">              
+          <div class="input-group-append">
+              <span class="input-group-text"><i class="fab fa-instagram-square"></i></span>               
+          </div>              
+              <input 
+              type="text" 
+              v-model="formData.instagran" 
+              name="instagran" 
+              :class="['form-control', 'input_user', {'is-invalid' : errors.instagran != '' }]"
+              value="" 
+              placeholder="@instagran"> 
+          </div>
             
 
             
@@ -108,12 +148,18 @@
         formData: {
           name: '',
           email:'',
+          endereco:'',
+          telefone:'',
+          instagran:'',
           password:''
         },
         errors: {
           name:'',
           email:'',
-          password: '',
+          endereco:'',
+          telefone:'',
+          instagran:'',
+          password: ''
 
         }
       }
@@ -157,6 +203,9 @@
         this.errors = {
           name: '',
           email:'',
+          endereco:'',
+          telefone:'',
+          instagran:'',
           password:''
 
         }
