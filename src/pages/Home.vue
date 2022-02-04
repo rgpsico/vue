@@ -17,7 +17,7 @@
               :src="company.image"
               :alt="company.name"
                :height="300"
-               :width="80"
+                :width="80"
               
               >
 
@@ -25,8 +25,8 @@
                   class="card-img-top"
                   src="@/assets/imgs/vue-food.png"
                   :alt="company.name"
-                   :height="80"
-               :width="80"
+                  :height="80"
+                  :width="80"
                   >
               </a>
                 <div class="restaurant-card-body">
