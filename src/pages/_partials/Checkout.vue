@@ -6,7 +6,7 @@
           <div class="my-4">
           <a  href="#" class="cart-finalizar" @click.prevent="openModalCheckout">Finalizar</a>
           </div>
-          <modal name="checkout">
+          <modal name="checkout"  >
               <div class="px-md-5 my-4" v-if="loading" >
                   <p>Gerando pedido ...(Aguarde)</p>
 
@@ -21,7 +21,7 @@
                            <div class="form-group">
                                <textarea name="comment" v-model="comment" id="" cols="30" rows="2" placeholder="Comentario"></textarea>
                            </div>
-                           <button class="btn btn-success" @click.prevent="createOrder">Fazer Pedidos</button>
+                      <button class="btn btn-success" @click.prevent="createOrder">Fazer Pedidos</button>
 
                   </div>
 
@@ -30,7 +30,8 @@
                             <p><strong>Total de produtos: {{products.length}}</strong></p>
                            <p><strong>Preço total: {{totalCart}}</strong></p>
                            <div class="form-group">
-                               <textarea name="comment" v-model="comment" id="" cols="30" rows="2" class="form-control" placeholder="Comentario">
+                               <textarea name="comment" v-model="comment" id="" cols="30" 
+                               rows="2" class="form-control" placeholder="Comentario">
 
                                </textarea>
                            </div>
@@ -143,12 +144,12 @@ export default {
   body {
     background-color: lightgreen;
   }
-  .modal-container{width:50%; width:40%; margin-left: 220px;}
+  .modal-container{width:100%; margin-left: 220px; backdrop-filter:;}
   .login{width:100%; text-transform: capitalize; margin-top:10px;}
 }
 
 @media screen and (min-width: 512px) { 
-  .modal-container{width:70%; margin-left: 50px; }
+  .modal-container{width:100%; margin-left: 50px; }
 }
 
 @media screen and (min-width: 800px) {

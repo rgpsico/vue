@@ -75,6 +75,12 @@
             Já tem conta?<i style="margin-right:5px;"></i>           
 
              <router-link :to="{name:'login'}" class="ml-2" >Login</router-link>
+            
+             
+          </div>
+          <div class="mt4 d-flex justify-content-center links text-light">
+                  <p style="color:#000;">Não tenho conta</p> <i style="margin-right:5px;"></i>   
+                  <router-link :to="{name:'register'}" class="ml-2" > Cadastrar</router-link>
           </div>
         </div>
       </div>
