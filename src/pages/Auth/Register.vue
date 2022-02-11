@@ -74,11 +74,11 @@
           </div>              
               <input 
               type="text" 
-              v-model="formData.celular" 
-              name="celular" 
-              :class="['form-control', 'input_user', {'is-invalid' : errors.celular != '' }]"
+              v-model="formData.telefone" 
+              name="telefone" 
+              :class="['form-control', 'input_user', {'is-invalid' : errors.telefone != '' }]"
               value="" 
-              placeholder="Celular"> 
+              placeholder="telefone"> 
           </div>
 
           <div class="input-group">              
