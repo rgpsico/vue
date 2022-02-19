@@ -25,25 +25,21 @@
 
                   </div>
 
-                  <div v-else class="row">
-                      <div class="col-12">
+                         <div v-else class="col-7" style="margin-left:20%;">                     
                             <p><strong>Total de produtos: {{products.length}}</strong></p>
                            <p><strong>Preço total: {{totalCart}}</strong></p>
                            <div class="form-group">
                                <textarea name="comment" v-model="comment" id="" cols="30" 
                                rows="2" class="form-control" placeholder="Comentario">
-
-                               </textarea>
-                           </div>
-                         
-                          
-                      </div>
-                        <div class="col-6">
+                               </textarea>                           
+                          </div>
+                        
+                        <div class="col-12">
                             <router-link  :to="{name: 'login'}" class="btn btn-dark btn-full login">
                                     fazer login
                             </router-link>
                         </div>
-                        <div class="col-6">
+                        <div class="col-12">
                              <router-link  :to="{name: 'register'}" class="btn btn-danger btn-full " style="margin-top:10px;">
                                     Cadastrar
                             </router-link>
