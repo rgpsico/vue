@@ -24,7 +24,7 @@ export default {
                 if (prodCart.identify === product.identify ) {
                     state.products[index].qty++
                 }
-                return state.product[index]
+                return state.products[index]
             })
         },
 
