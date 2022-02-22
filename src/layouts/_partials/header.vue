@@ -6,7 +6,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-PPGFOOD">
       <div class="container">    
         <router-link :to="{name:'home'}" class="navbar-brand">
-             <img src="@/assets/imgs/logo-PPGFOOD.png" alt="PPGFOOD" class="logo">
+             <img src="@/assets/imgs/logo-vuefood.png" alt="PPGFOOD" class="logo">
         </router-link>
         <div>
           <ul class="navbar-nav ml-auto">

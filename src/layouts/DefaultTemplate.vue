@@ -38,7 +38,7 @@ export default {
 </script>
 
 <style scoped>
-@import url('../assets/css/PPGFOOD.css');
+@import url('../assets/css/vuefood.css');
 @import url('../assets/css/reset.css');
 </style>
 

@@ -9,8 +9,9 @@ Vue.use(VueRouter)
 
 
 const router = new VueRouter({
-    routes,
-    mode: 'history'
+    mode: 'history',
+    routes
+  
 })
 
 export default router
