@@ -1,4 +1,4 @@
-# vuefood
+# PPGFOOD
 
 ## Project setup
 ```
