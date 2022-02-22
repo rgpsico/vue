@@ -1,6 +1,6 @@
 <template>
     <div>
-      <div class="cart-price text-red">
+      <div class="cart-price text-red" >
               Preço Total: <b>R$ {{totalCart}}</b>
           </div>
           <div class="my-4">
@@ -29,8 +29,9 @@
                             <p><strong>Total de produtos: {{products.length}}</strong></p>
                            <p><strong>Preço total: {{totalCart}}</strong></p>
                            <div class="form-group">
-                               <textarea name="comment" v-model="comment" id="" cols="30" 
-                               rows="2" class="form-control" placeholder="Comentario">
+                               <textarea name="comment" 
+                                        v-model="comment" id="" cols="30" 
+                                         rows="2" class="form-control" placeholder="Comentario">
                                </textarea>                           
                           </div>
                         
@@ -140,9 +141,12 @@ export default {
   body {
     background-color: lightgreen;
   }
+  
   .modal-container{width:100%; margin-left: 140px; }
   .login{width:90%; text-transform: capitalize; margin-top:10px;}
   .register{width:90%; text-transform: capitalize; margin-top:10px;}
+  textarea{width:90%;}
+  
 }
 
 @media screen and (min-width: 512px) { 
