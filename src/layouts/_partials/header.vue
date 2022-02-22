@@ -1,7 +1,8 @@
 <template>
+
      <header>
      <!-- Navigation -->
-
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-vuefood">
       <div class="container">    
         <router-link :to="{name:'home'}" class="navbar-brand">

@@ -6,14 +6,14 @@
           <div class="my-4">
           <a  href="#" class="cart-finalizar" @click.prevent="openModalCheckout">Finalizar</a>
           </div>
-          <modal name="checkout"  >
+          <modal name="checkout">
               <div class="px-md-5 my-4" v-if="loading" >
                   <p>Gerando pedido ...(Aguarde)</p>
 
 
               </div>
 
-              <div class="modal-container"  v-else>
+              <div class="modal-container"   v-else>
               <div class="px-md-5 my-4" >
                   <div class="col-12" v-if="me.name !== '' ">
                       <p><strong>Total de produtos: {{products.length}}</strong></p>
@@ -40,7 +40,7 @@
                             </router-link>
                         </div>
                         <div class="col-12">
-                             <router-link  :to="{name: 'register'}" class="btn btn-danger btn-full " style="margin-top:10px;">
+                             <router-link  :to="{name: 'register'}" class="btn btn-danger btn-full register" style="margin-top:10px;">
                                     Cadastrar
                             </router-link>
                         </div>
@@ -140,8 +140,9 @@ export default {
   body {
     background-color: lightgreen;
   }
-  .modal-container{width:100%; margin-left: 220px; backdrop-filter:;}
-  .login{width:100%; text-transform: capitalize; margin-top:10px;}
+  .modal-container{width:100%; margin-left: 140px; }
+  .login{width:90%; text-transform: capitalize; margin-top:10px;}
+  .register{width:90%; text-transform: capitalize; margin-top:10px;}
 }
 
 @media screen and (min-width: 512px) { 
