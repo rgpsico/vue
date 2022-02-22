@@ -4,9 +4,10 @@
               Preço Total: <b>R$ {{totalCart}}</b>
           </div>
           <div class="my-4">
-          <a  href="#" class="cart-finalizar" @click.prevent="openModalCheckout">Finalizar</a>
+           
+          <a  href="#" class="cart-finalizar" @click.prevent="$bvModal.show('bv-modal-example')">Finalizar</a>
           </div>
-          <modal name="checkout">
+          <b-modal id="bv-modal-example" hide-footer hide-header hide-backdrop>
               <div class="px-md-5 my-4" v-if="loading" >
                   <p>Gerando pedido ...(Aguarde)</p>
 
@@ -42,7 +43,7 @@
                         </div>
                         <div class="col-12">
                              <router-link  :to="{name: 'register'}" class="btn btn-danger btn-full register" style="margin-top:10px;">
-                                    Cadastrars
+                                    Cadastrar
                             </router-link>
                         </div>
                         <div class="col-12 my-4">
@@ -51,7 +52,7 @@
                   </div>
             </div>
               </div>
-          </modal>
+          </b-modal>
     </div>
 </template>
 
@@ -142,7 +143,7 @@ export default {
     background-color: lightgreen;
   }
   
-  .modal-container{width:100%; margin-left: 140px; }
+  .modal-container{width:100%; }
   .login{width:90%; text-transform: capitalize; margin-top:10px;}
   .register{width:90%; text-transform: capitalize; margin-top:10px;}
   textarea{width:90%;}
