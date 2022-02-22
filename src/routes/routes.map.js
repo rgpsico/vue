@@ -43,8 +43,8 @@ const routes = [
                 name: 'home'
             },
             {
-                
-                path: "*", 
+
+                path:'/:pathMatch(.*)', 
                 component: Home,
                 name:'home' 
             }

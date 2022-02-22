@@ -48,13 +48,13 @@
       <hr>
       <button class="btn btn-success col-md-2"
         @v-if="me.name != '' && me.name === order.client.name && order.evaluation.length == 0"
-        @click.prevent="openModalEvaluation"
+        @click.prevent="$bvModal.show('bv-modal-example')"
         >
         Avaliar o Pedido
        
       </button>
 
-    <modal name="evaluation-order" :heigth="350">
+    <b-modal  id="bv-modal-example" name="evaluation-order" hide-footer hide-header hide-backdrop>
       <div class="px-md-5 my-4">
         <h1>Avaliar o pedido {{identify}}</h1>
 
@@ -84,7 +84,7 @@
         <span v-else>Avaliar</span>
         </button>
       </div>
-      </modal>
+     </b-modal>
 
       <div class="evaluations-order col-12" v-if="order.evaluations.length">
         <div v-for="(evaluation, index)  in order.evaluations" :key="index">
