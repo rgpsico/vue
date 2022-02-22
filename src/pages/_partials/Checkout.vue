@@ -41,7 +41,7 @@
                         </div>
                         <div class="col-12">
                              <router-link  :to="{name: 'register'}" class="btn btn-danger btn-full register" style="margin-top:10px;">
-                                    Cadastrar
+                                    Cadastrars
                             </router-link>
                         </div>
                         <div class="col-12 my-4">
