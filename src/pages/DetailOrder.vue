@@ -48,13 +48,13 @@
       <hr>
       <button class="btn btn-success col-md-2"
         @v-if="me.name != '' && me.name === order.client.name && order.evaluation.length == 0"
-        @click.prevent="$bvModal.show('bv-modal-example')"
+        @click.prevent="$bvModal.show('modal-avalition')"
         >
         Avaliar o Pedido
        
       </button>
 
-    <b-modal  id="bv-modal-example" name="evaluation-order" hide-footer hide-header hide-backdrop>
+    <b-modal  id="modal-avalition" name="evaluation-order" hide-footer hide-header hide-backdrop>
       <div class="px-md-5 my-4">
         <h1>Avaliar o pedido {{identify}}</h1>
 
@@ -195,6 +195,7 @@ export default {
            this.$vToastify.success('Avaliação enviada com successo','Parabéns')
            this.order.evaluations.push(response.data.data)
            this.closeModalEvaluation()
+           this.$bvModal.hide('modal-avalition')
          })
          .catch(_=>   this.$vToastify.error('Falha ao Avaliar','Erro'))
          .finally(()=> this.loadSendEvaluation = false)
