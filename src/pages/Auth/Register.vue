@@ -37,7 +37,30 @@
                   { 'is-invalid': errors.name != '' },
                 ]"
                 value=""
-                placeholder="Nome aa"
+                placeholder="Nome"
+              />
+            </div>
+
+            <div class="text-danger" v-if="errors.cpf != ''">
+              {{ errors.cpf[0] || "" }}
+            </div>
+            <div class="input-group">
+              <div class="input-group-append">
+                <span class="input-group-text"
+                  ><i class="fas fa-id-card"></i
+                ></span>
+              </div>
+              <input
+                type="text"
+                v-model="formData.cpf"
+                name="cpf"
+                :class="[
+                  'form-control',
+                  'input_user',
+                  { 'is-invalid': errors.cpf != '' },
+                ]"
+                value=""
+                placeholder="CPF"
               />
             </div>
 
@@ -81,7 +104,7 @@
                   { 'is-invalid': errors.endereco != '' },
                 ]"
                 value=""
-                placeholder="Local onde mora"
+                placeholder="Endereço Completo"
               />
             </div>
 
@@ -101,7 +124,7 @@
                   { 'is-invalid': errors.telefone != '' },
                 ]"
                 value=""
-                placeholder="telefone"
+                placeholder="Telefone"
               />
             </div>
 
@@ -121,7 +144,7 @@
                   { 'is-invalid': errors.instagran != '' },
                 ]"
                 value=""
-                placeholder="@instagran"
+                placeholder="@Instagram"
               />
             </div>
 
@@ -182,6 +205,7 @@ export default {
       loading: false,
       formData: {
         name: "",
+        cpf: "",
         email: "",
         endereco: "",
         telefone: "",
@@ -190,6 +214,7 @@ export default {
       },
       errors: {
         name: "",
+        cpf: "",
         email: "",
         endereco: "",
         telefone: "",
@@ -207,10 +232,7 @@ export default {
 
       this.register(this.formData)
         .then((response) => {
-          this.$vToastify.success(
-            "Cadastro realizado com successo",
-            "Parabéns"
-          );
+          this.$vToastify.success("Cadastro realizado com sucesso", "Parabéns");
           this.$router.push({ name: "login" });
         })
         .catch((error) => {
@@ -220,7 +242,7 @@ export default {
             this.errors = Object.assign(this.errors, errorResponse.data.errors);
 
             this.$vToastify.error(
-              "Dados inválidos , verifique novamente ",
+              "Dados inválidos, verifique novamente ",
               "Erro"
             );
 
@@ -235,6 +257,7 @@ export default {
     reset() {
       this.errors = {
         name: "",
+        cpf: "",
         email: "",
         endereco: "",
         telefone: "",
@@ -245,3 +268,7 @@ export default {
   },
 };
 </script>
+
+<style>
+/* Adicione aqui qualquer estilo adicional, se precisar */
+</style>
