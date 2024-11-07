@@ -1,5 +1,4 @@
 import axios from 'axios'
-
 import { TOKEN_NAME } from '@/configs/api'
 
 export default {
@@ -9,7 +8,7 @@ export default {
             email: '',
         },
         authenticated: false,
-        asaasCustomerId: null, // adiciona o campo para armazenar o ID do cliente do Asaas
+        asaasCustomerId: null, // Armazena o ID do cliente do Asaas
     },
 
     mutations: {
@@ -102,6 +101,17 @@ export default {
             .catch(error => {
                 console.error('Erro ao cadastrar cliente no Asaas:', error);
             });
+        },
+
+        // Action para atualizar o asaas_key com base no email
+        updateAsaasKeyByEmail({ commit }, { email, asaasKey }) {
+            return axios.put('clients/update-asaas-key', { email, asaas_key: asaasKey })
+                .then(response => {
+                    console.log('Asaas key atualizada com sucesso para o email:', email);
+                })
+                .catch(error => {
+                    console.error('Erro ao atualizar asaas key:', error);
+                });
         },
     },
 };
