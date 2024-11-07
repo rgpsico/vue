@@ -227,32 +227,42 @@ export default {
     ...mapActions(["register"]),
 
     registerClient() {
-      this.reset();
-      this.loading = true;
+      try {
+        this.reset();
+        this.loading = true;
 
-      this.register(this.formData)
-        .then((response) => {
-          this.$vToastify.success("Cadastro realizado com sucesso", "Parabéns");
-          this.$router.push({ name: "login" });
-        })
-        .catch((error) => {
-          const errorResponse = error.response;
-
-          if (errorResponse.status === 422) {
-            this.errors = Object.assign(this.errors, errorResponse.data.errors);
-
-            this.$vToastify.error(
-              "Dados inválidos, verifique novamente ",
-              "Erro"
+        this.register(this.formData)
+          .then((response) => {
+            this.$vToastify.success(
+              "Cadastro realizado com sucesso",
+              "Parabéns"
             );
+            this.$router.push({ name: "login" });
+          })
+          .catch((error) => {
+            const errorResponse = error.response;
 
-            setTimeout(() => this.reset(), 4000);
-            return;
-          }
+            if (errorResponse.status === 422) {
+              this.errors = Object.assign(
+                this.errors,
+                errorResponse.data.errors
+              );
 
-          this.$vToastify.error("Falha ao Registrar", "Erro");
-        })
-        .finally(() => (this.loading = false));
+              this.$vToastify.error(
+                "Dados inválidos, verifique novamente ",
+                "Erro"
+              );
+
+              setTimeout(() => this.reset(), 4000);
+              return;
+            }
+
+            this.$vToastify.error("Falha ao Registrar", "Erro");
+          })
+          .finally(() => (this.loading = false));
+      } catch (error) {
+        console.log(error);
+      }
     },
     reset() {
       this.errors = {
