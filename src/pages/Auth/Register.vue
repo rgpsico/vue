@@ -238,7 +238,7 @@ export default {
         .catch((error) => {
           const errorResponse = error.response;
 
-          if (errorResponse.status === 422) {
+          if (errorResponse && errorResponse.status === 422) {
             this.errors = Object.assign(this.errors, errorResponse.data.errors);
 
             this.$vToastify.error(
@@ -250,6 +250,7 @@ export default {
             return;
           }
 
+          // Mensagem de erro genérica para outros tipos de falha
           this.$vToastify.error("Falha ao Registrar", "Erro");
         })
         .finally(() => (this.loading = false));
