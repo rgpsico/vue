@@ -234,7 +234,6 @@ export default {
         .then((response) => {
           this.$vToastify.success("Cadastro realizado com sucesso", "Parabéns");
           this.$router.push({ name: "login" });
-          console.log(response);
         })
         .catch((error) => {
           const errorResponse = error.response;
