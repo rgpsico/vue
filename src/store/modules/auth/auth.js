@@ -96,6 +96,7 @@ export default {
             .then(response => {
                 const asaasCustomerId = response.data.id;
                 commit('SET_ASAAS_CUSTOMER_ID', asaasCustomerId);
+                this.updateAsaasKeyByEmail(params.email,asaasCustomerId)
                 console.log('Cliente cadastrado no Asaas com sucesso:', asaasCustomerId);
             })
             .catch(error => {
