@@ -41,7 +41,7 @@ export default {
             return axios.post('auth/register', params)
                 .then(() => {
                     // Após registrar, chama a action para registrar no Asaas
-                    return dispatch('registerWithAsaas', params);
+                   // return dispatch('registerWithAsaas', params);
                 });
         },
 
@@ -95,6 +95,7 @@ export default {
                 cpf: params.cpf, // Adiciona o campo CPF
             })
             .then(response => {
+                console.log(response)
                 const asaasCustomerId = response.data.id;
                 commit('SET_ASAAS_CUSTOMER_ID', asaasCustomerId);
                 console.log('Cliente cadastrado no Asaas com sucesso:', asaasCustomerId);
