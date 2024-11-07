@@ -92,6 +92,7 @@ export default {
                 address: params.address,
                 postalCode: params.postalCode,
                 province: params.province,
+                cpf: params.cpf, // Adiciona o campo CPF
             })
             .then(response => {
                 const asaasCustomerId = response.data.id;
