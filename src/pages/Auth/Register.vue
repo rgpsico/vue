@@ -234,11 +234,12 @@ export default {
         .then((response) => {
           this.$vToastify.success("Cadastro realizado com sucesso", "Parabéns");
           this.$router.push({ name: "login" });
+          console.log(response);
         })
         .catch((error) => {
           const errorResponse = error.response;
 
-          if (errorResponse && errorResponse.status === 422) {
+          if (errorResponse.status === 422) {
             this.errors = Object.assign(this.errors, errorResponse.data.errors);
 
             this.$vToastify.error(
@@ -250,7 +251,6 @@ export default {
             return;
           }
 
-          // Mensagem de erro genérica para outros tipos de falha
           this.$vToastify.error("Falha ao Registrar", "Erro");
         })
         .finally(() => (this.loading = false));
