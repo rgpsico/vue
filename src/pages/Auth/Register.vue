@@ -237,7 +237,7 @@ export default {
         })
         .catch((error) => {
           const errorResponse = error.response;
-
+          console.log(errorResponse);
           if (errorResponse.status === 422) {
             this.errors = Object.assign(this.errors, errorResponse.data.errors);
 
