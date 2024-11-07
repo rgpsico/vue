@@ -85,7 +85,7 @@ export default {
 
         // Action para cadastrar o cliente no Asaas
         registerWithAsaas({ commit }, params) {
-            return axios.post('http://127.0.0.1:8000/api/asaas/customer', {
+            return axios.post('asaas/customer', {
                 name: params.name,
                 email: params.email,
                 phone: params.phone,
