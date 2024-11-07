@@ -109,7 +109,7 @@ export default {
 
         // Action para atualizar o asaas_key com base no email
         updateAsaasKeyByEmail({ commit }, { email, asaasKey }) {
-            return axios.put('clients/update-asaas-key', { email, asaas_key: asaasKey })
+            return axios.put('asaas/update-asaas-key', { email, asaas_key: asaasKey })
                 .then(response => {
                     console.log('Asaas key atualizada com sucesso para o email:', email);
                 })
