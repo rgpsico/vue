@@ -83,7 +83,7 @@ export default {
         },
 
         // Action para cadastrar o cliente no Asaas
-        registerWithAsaas({ commit }, params) {
+        registerWithAsaas({ commit, dispatch }, params) {
             return axios.post('asaas/customer', {
                 name: params.name,
                 email: params.email,
@@ -96,7 +96,10 @@ export default {
             .then(response => {
                 const asaasCustomerId = response.data.id;
                 commit('SET_ASAAS_CUSTOMER_ID', asaasCustomerId);
-                this.updateAsaasKeyByEmail(params.email,asaasCustomerId)
+                
+                // Chama a action de update usando dispatch e passando email e asaasCustomerId
+                dispatch('updateAsaasKeyByEmail', { email: params.email, asaasKey: asaasCustomerId });
+                
                 console.log('Cliente cadastrado no Asaas com sucesso:', asaasCustomerId);
             })
             .catch(error => {
