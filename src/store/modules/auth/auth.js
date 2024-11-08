@@ -39,8 +39,22 @@ export default {
         register({ commit, dispatch }, params) {
             return axios.post('auth/register', params)
                 .then(() => {
-                    // Após registrar, chama a action para registrar no Asaas
-                    return dispatch('registerWithAsaas', params);
+                    // Após registrar, autentica o usuário automaticamente
+                    const loginParams = {
+                        email: params.email,
+                        password: params.password,
+                        device_name: 'web', // Inclui o device_name para o login
+                    };
+                    return dispatch('login', loginParams);
+                })
+                .catch(error => {
+                    // Exibe o erro adequadamente
+                    if (error.response && error.response.status === 422) {
+                        console.error('Erro ao registrar:', error.response.data.errors);
+                    } else {
+                        console.error('Erro ao registrar:', error.message);
+                    }
+                    throw error; // Lança o erro para que possa ser tratado pela interface do usuário
                 });
         },
 
@@ -49,7 +63,19 @@ export default {
                 .then(response => {
                     const token = response.data.token;
                     localStorage.setItem(TOKEN_NAME, token);
-                    dispatch('getMe');
+                    return dispatch('getMe').then(() => {
+                        // Redireciona o usuário para a página inicial após o login bem-sucedido
+                        window.location.href = '/';
+                    });
+                })
+                .catch(error => {
+                    // Exibe o erro adequadamente
+                    if (error.response && error.response.status === 422) {
+                        console.error('Erro ao fazer login:', error.response.data.errors);
+                    } else {
+                        console.error('Erro ao fazer login:', error.message);
+                    }
+                    throw error; // Lança o erro para que possa ser tratado pela interface do usuário
                 });
         },
 
@@ -62,8 +88,17 @@ export default {
                     'Authorization': `Bearer ${token}`,
                 },
             })
-            .then(response => commit('SET_ME', response.data.data))
-            .catch(error => localStorage.removeItem(TOKEN_NAME));
+            .then(response => {
+                commit('SET_ME', response.data.data);
+                // Salvando asaas_key no localStorage para transações futuras
+                if (response.data.data.asaas_key) {
+                    localStorage.setItem('asaas_key', response.data.data.asaas_key);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao obter informações do usuário:', error);
+                localStorage.removeItem(TOKEN_NAME);
+            });
         },
 
         logout({ commit }) {
@@ -75,10 +110,16 @@ export default {
                     'Authorization': `Bearer ${token}`,
                 },
             })
-            .then(response => {
+            .then(() => {
                 commit('LOGOUT');
-                console.log('deslogou');
+                console.log('Deslogou');
                 localStorage.removeItem(TOKEN_NAME);
+                localStorage.removeItem('asaas_key'); // Remove o asaas_key do localStorage ao fazer logout
+                // Redireciona para a página de login após o logout
+                window.location.href = '/login';
+            })
+            .catch(error => {
+                console.error('Erro ao fazer logout:', error);
             });
         },
 
@@ -96,6 +137,7 @@ export default {
             .then(response => {
                 const asaasCustomerId = response.data.id;
                 commit('SET_ASAAS_CUSTOMER_ID', asaasCustomerId);
+                localStorage.setItem('asaas_key', asaasCustomerId); // Salva o asaas_key no localStorage
                 
                 // Chama a action de update usando dispatch e passando email e asaasCustomerId
                 dispatch('updateAsaasKeyByEmail', { email: params.email, asaasKey: asaasCustomerId });
@@ -104,14 +146,15 @@ export default {
             })
             .catch(error => {
                 console.error('Erro ao cadastrar cliente no Asaas:', error);
+                throw error; // Lança o erro para que possa ser tratado pela interface do usuário
             });
         },
 
         // Action para atualizar o asaas_key com base no email
         updateAsaasKeyByEmail({ commit }, { email, asaasKey }) {
             return axios.put('asaas/update-asaas-key', { email, asaas_key: asaasKey })
-                .then(response => {
-                    console.log('Asaas key atualizada com sucesso para o email:', email);
+                .then(() => {
+                    console.log('Asaas key atualizado com sucesso para o email:', email);
                 })
                 .catch(error => {
                     console.error('Erro ao atualizar asaas key:', error);
