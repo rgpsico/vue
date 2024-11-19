@@ -29,7 +29,7 @@
                 id=""
                 cols="30"
                 rows="2"
-                placeholder="Comentario"
+                placeholder="Comentário"
                 class="form-control"
               ></textarea>
             </div>
@@ -43,12 +43,13 @@
                 id="paymentMethod"
                 class="form-control"
               >
-                <option value="pix">Pix</option>
+                <!-- <option value="pix">Pix</option> -->
                 <option value="cartao_credito">Cartão de Crédito</option>
                 <option value="pagamento_entrega">Pagamento na Entrega</option>
               </select>
             </div>
 
+            <!-- Campos de cartão de crédito -->
             <div
               v-if="paymentMethod === 'cartao_credito'"
               class="form-group my-4"
@@ -61,7 +62,6 @@
                 class="form-control"
                 placeholder="Número do Cartão"
               />
-
               <label for="cardHolder" class="mt-2">Nome no Cartão:</label>
               <input
                 type="text"
@@ -70,7 +70,6 @@
                 class="form-control"
                 placeholder="Nome no Cartão"
               />
-
               <label for="expiryMonth" class="mt-2">Mês de Validade:</label>
               <input
                 type="text"
@@ -79,7 +78,6 @@
                 class="form-control"
                 placeholder="MM"
               />
-
               <label for="expiryYear" class="mt-2">Ano de Validade:</label>
               <input
                 type="text"
@@ -88,7 +86,6 @@
                 class="form-control"
                 placeholder="AAAA"
               />
-
               <label for="cvv" class="mt-2">CVV:</label>
               <input
                 type="text"
@@ -97,6 +94,15 @@
                 class="form-control"
                 placeholder="CVV"
               />
+            </div>
+
+            <!-- Exibe QR Code Pix -->
+            <div
+              v-if="paymentMethod === 'pix' && qrCodeUrl"
+              class="text-center"
+            >
+              <img :src="qrCodeUrl" alt="QR Code Pix" />
+              <p>Escaneie o QR Code com o aplicativo do seu banco para pagar</p>
             </div>
 
             <button class="btn btn-success" @click.prevent="createOrder">
@@ -119,7 +125,7 @@
                 cols="30"
                 rows="2"
                 class="form-control"
-                placeholder="Comentario"
+                placeholder="Comentário"
               ></textarea>
             </div>
 
@@ -168,12 +174,10 @@ export default {
     }),
 
     totalCart() {
-      let total = 0;
-
-      this.products.forEach((itemCart) => {
-        total += itemCart.qty * itemCart.product.price;
-      });
-      return total;
+      return this.products.reduce(
+        (total, item) => total + item.qty * item.product.price,
+        0
+      );
     },
   },
 
@@ -181,13 +185,13 @@ export default {
     return {
       comment: "",
       loading: false,
-      paymentMethod: "pix", // Método de pagamento padrão
-      // Valores fictícios para o cartão de crédito
-      cardNumber: "4000000000000010",
-      cardHolder: "roger neves",
-      expiryMonth: "10",
-      expiryYear: "2025",
-      cvv: "1234",
+      paymentMethod: "",
+      qrCodeUrl: "",
+      cardNumber: "",
+      cardHolder: "",
+      expiryMonth: "",
+      expiryYear: "",
+      cvv: "",
     };
   },
 
@@ -197,7 +201,6 @@ export default {
     createOrder() {
       this.loading = true;
 
-      // Recupera a asaas_key do localStorage
       const asaasKey = localStorage.getItem("asaas_key");
 
       if (!asaasKey) {
@@ -211,11 +214,22 @@ export default {
         asaas_key: asaasKey,
         comment: this.comment,
         payment_method: this.paymentMethod,
-        value: this.totalCart, // Incluindo valor total
+        value: this.totalCart,
         products: [...this.products],
       };
 
-      if (this.paymentMethod === "cartao_credito") {
+      if (this.paymentMethod === "pix") {
+        this.generatePixQrCode(params, asaasKey)
+          .then((qrCodeUrl) => {
+            this.qrCodeUrl = qrCodeUrl;
+            this.$vToastify.success("QR Code gerado com sucesso!", "Pix");
+          })
+          .catch((error) => {
+            console.error("Erro ao gerar QR Code Pix:", error);
+            this.$vToastify.error("Erro ao gerar QR Code Pix", "Erro");
+          })
+          .finally(() => (this.loading = false));
+      } else if (this.paymentMethod === "cartao_credito") {
         params = {
           ...params,
           creditCard: {
@@ -228,15 +242,14 @@ export default {
           creditCardHolderInfo: {
             name: this.me.name,
             email: this.me.email,
-            cpfCnpj: "", // Adicione o CPF do cliente, caso tenha
-            postalCode: "", // Adicione o CEP do cliente, caso tenha
-            addressNumber: "", // Adicione o número do endereço do cliente, caso tenha
-            phone: "", // Adicione o telefone do cliente, caso tenha
-            mobilePhone: "", // Adicione o celular do cliente, caso tenha
+            cpfCnpj: "",
+            postalCode: "",
+            addressNumber: "",
+            phone: "",
+            mobilePhone: "",
           },
         };
 
-        // Chama a action de criar pagamento com cartão de crédito
         this.createPaymentWithCreditCard(params)
           .then((order) => {
             if (order && order.identify) {
@@ -259,35 +272,32 @@ export default {
             this.$vToastify.error("Erro ao realizar pagamento", "Erro");
           })
           .finally(() => (this.loading = false));
-      } else {
-        // Fluxo padrão para Pix ou pagamento na entrega
-        const action =
-          this.me.name === "" ? "createOrder" : "createOrderAuthenticated";
-
-        this.$store
-          .dispatch(action, params)
-          .then((order) => {
-            if (order && order.identify) {
-              this.$vToastify.success(
-                "Pedido realizado com sucesso!",
-                "Parabéns"
-              );
-              this.$router.push({
-                name: "order.detail",
-                params: {
-                  identify: order.identify,
-                },
-              });
-            } else {
-              throw new Error("Identificador do pedido não encontrado.");
-            }
-          })
-          .catch((error) => {
-            console.error("Erro ao realizar pedido:", error);
-            this.$vToastify.error("Pedido não pode ser realizado", "Erro");
-          })
-          .finally(() => (this.loading = false));
       }
+    },
+
+    async generatePixQrCode(params, asaasKey) {
+      const url = "https://www.asaas.com/api/v3/payments";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          access_token: asaasKey,
+        },
+        body: JSON.stringify({
+          customer: this.me.id,
+          billingType: "PIX",
+          value: params.value,
+          dueDate: new Date().toISOString().split("T")[0],
+          description: "Pedido no valor de R$ " + params.value,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao gerar QR Code");
+      }
+
+      const data = await response.json();
+      return data.pixQrCode;
     },
 
     openModalCheckout() {
@@ -303,28 +313,16 @@ export default {
 
 <style scoped>
 @media screen and (min-width: 300px) {
-  body {
-    background-color: lightgreen;
-  }
-
   .modal-container {
     width: 100%;
   }
 
-  .login {
-    width: 90%;
-    text-transform: capitalize;
-    margin-top: 10px;
-  }
-
-  .register {
-    width: 90%;
-    text-transform: capitalize;
-    margin-top: 10px;
-  }
-
+  .login,
+  .register,
   textarea {
     width: 90%;
+    text-transform: capitalize;
+    margin-top: 10px;
   }
 }
 
