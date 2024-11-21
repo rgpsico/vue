@@ -26,7 +26,6 @@
               <textarea
                 name="comment"
                 v-model="comment"
-                id=""
                 cols="30"
                 rows="2"
                 placeholder="Comentário"
@@ -43,7 +42,7 @@
                 id="paymentMethod"
                 class="form-control"
               >
-               
+                <option value="pix">Pix</option>
                 <option value="cartao_credito">Cartão de Crédito</option>
                 <option value="pagamento_entrega">Pagamento na Entrega</option>
               </select>
@@ -121,7 +120,6 @@
               <textarea
                 name="comment"
                 v-model="comment"
-                id=""
                 cols="30"
                 rows="2"
                 class="form-control"
@@ -145,15 +143,6 @@
               >
                 Cadastrar
               </router-link>
-            </div>
-            <div class="col-12 my-4">
-              <button
-                class="btn btn-success btn-full"
-                @click.prevent="createOrder"
-                v-if="me.name !== ''"
-              >
-                Fazer Pedido
-              </button>
             </div>
           </div>
         </div>
@@ -185,7 +174,7 @@ export default {
     return {
       comment: "",
       loading: false,
-      paymentMethod: "",
+      paymentMethod: "pix",
       qrCodeUrl: "",
       cardNumber: "",
       cardHolder: "",
@@ -242,11 +231,6 @@ export default {
           creditCardHolderInfo: {
             name: this.me.name,
             email: this.me.email,
-            cpfCnpj: "",
-            postalCode: "",
-            addressNumber: "",
-            phone: "",
-            mobilePhone: "",
           },
         };
 
@@ -272,6 +256,30 @@ export default {
             this.$vToastify.error("Erro ao realizar pagamento", "Erro");
           })
           .finally(() => (this.loading = false));
+      }
+
+      if (this.paymentMethod === "pagamento_entrega") {
+        this.$store
+          .dispatch("createOrder", params)
+          .then((order) => {
+            this.$vToastify.success(
+              "Pedido realizado com sucesso!",
+              "Parabéns"
+            );
+            this.$router.push({
+              name: "order.detail",
+              params: {
+                identify: order.identify,
+              },
+            });
+          })
+          .catch((error) => {
+            console.error("Erro ao criar pedido:", error);
+            this.$vToastify.error("Erro ao criar pedido", "Erro");
+          })
+          .finally(() => {
+            this.loading = false;
+          });
       }
     },
 
@@ -303,41 +311,19 @@ export default {
     openModalCheckout() {
       this.$bvModal.show("bv-modal-example");
     },
-
-    closeModalCheckout() {
-      this.$bvModal.hide("bv-modal-example");
-    },
   },
 };
 </script>
 
 <style scoped>
-@media screen and (min-width: 300px) {
-  .modal-container {
-    width: 100%;
-  }
-
-  .login,
-  .register,
-  textarea {
-    width: 90%;
-    text-transform: capitalize;
-    margin-top: 10px;
-  }
+.modal-container {
+  padding: 20px;
 }
 
-@media screen and (min-width: 512px) {
-  .modal-container {
-    width: 100%;
-    margin-left: 50px;
-  }
-}
-
-@media screen and (min-width: 800px) {
-  .modal-container {
-    width: 100%;
-    padding: 20px;
-    margin-left: 0;
-  }
+.login,
+.register,
+textarea {
+  width: 100%;
+  margin-top: 10px;
 }
 </style>

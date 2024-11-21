@@ -74,7 +74,7 @@ const actions = {
 
   // Criar pedido para usuário não autenticado
   createOrder({ commit }, params) {
-    return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
       axios
         .post(`${API_VERSION}/orders`, params)
         .then((response) => {
