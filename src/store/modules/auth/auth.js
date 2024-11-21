@@ -64,8 +64,7 @@ export default {
                     const token = response.data.token;
                     localStorage.setItem(TOKEN_NAME, token);
                     return dispatch('getMe').then(() => {
-                        // Redireciona o usuário para a página inicial após o login bem-sucedido
-                        window.location.href = '/';
+                          window.location.href = '/';
                     });
                 })
                 .catch(error => {
@@ -90,9 +89,13 @@ export default {
             })
             .then(response => {
                 commit('SET_ME', response.data.data);
-                // Salvando asaas_key no localStorage para transações futuras
+              console.log(response)
                 if (response.data.data.asaas_key) {
                     localStorage.setItem('asaas_key', response.data.data.asaas_key);
+                }
+
+                if (response.data.data.client_id) {
+                    localStorage.setItem('client_id', response.data.data.client_id);
                 }
             })
             .catch(error => {
