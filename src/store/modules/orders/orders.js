@@ -74,15 +74,7 @@ const actions = {
 
   // Criar pedido para usuário não autenticado
   createOrder({ commit }, params) {
-    return new Promise((resolve, reject) => {
-      // Recuperar o client_id do localStorage
-      const clientId = localStorage.getItem('client_id');
-      
-      // Adicionar o client_id ao objeto params
-      if (clientId) {
-        params.client_id = clientId;
-      }
-  
+      return new Promise((resolve, reject) => {
       axios
         .post(`${API_VERSION}/orders`, params)
         .then((response) => {
@@ -95,7 +87,6 @@ const actions = {
         });
     });
   },
-  
 
   // Criar pedido autenticado
   createOrderAuthenticated({ commit }, params) {
