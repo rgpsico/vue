@@ -42,8 +42,8 @@
                 id="paymentMethod"
                 class="form-control"
               >
-                <option value="pix">Pix</option>
-                <option value="cartao_credito">Cartão de Crédito</option>
+                <!-- <option value="pix">Pix</option> -->
+                <!-- <option value="cartao_credito">Cartão de Crédito</option> -->
                 <option value="pagamento_entrega">Pagamento na Entrega</option>
               </select>
             </div>
@@ -174,7 +174,7 @@ export default {
     return {
       comment: "",
       loading: false,
-      paymentMethod: "pix",
+      paymentMethod: "pagamento_entrega",
       qrCodeUrl: "",
       cardNumber: "",
       cardHolder: "",
