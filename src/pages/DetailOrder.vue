@@ -4,7 +4,7 @@
       <!-- Detalhes do Pedido -->
       <div class="col-12 mb-2">
         <h1 class="title-tenant h2">
-          Detalhes do Pedido <strong>{{ identify }}</strong>
+          Detalhes do Pedidosss <strong>{{ identify }}</strong>
         </h1>
       </div>
       <div class="col-sm-6">
