@@ -28,7 +28,7 @@
               <li><b>Nome:</b> {{ order.client.name }}</li>
               <li><b>E-mail:</b> {{ order.client.email }}</li>
               <li>
-                <b>Código do entregador: </b> {{ order.client.codigo_entrega }}
+                <b>Código do entregador: </b> {{ order.codigo_entrega }}
               </li>
             </ul>
           </li>
