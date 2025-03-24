@@ -77,7 +77,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       // Recuperar o client_id e token do localStorage
       const clientId = localStorage.getItem('client_id');
-      const token = localStorage.getItem('token'); // ajuste conforme o nome do token no seu localStorage
+      const token = localStorage.getItem('token_sanctum'); // ajuste conforme o nome do token no seu localStorage
   
       // Adicionar o client_id ao objeto params
       if (clientId) {
