@@ -136,7 +136,7 @@
     </b-modal>
 
     <!-- Seção de Conversa com o Entregador -->
-    <div class="row my-4">
+    <!-- <div class="row my-4">
       <div class="col-12">
         <h4>Conversa com o Entregador</h4>
         <div class="chat-box">
@@ -173,7 +173,7 @@
           <button class="btn btn-primary" @click="sendMessage">Enviar</button>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
