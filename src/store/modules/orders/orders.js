@@ -75,16 +75,23 @@ const actions = {
   // Criar pedido para usuário não autenticado
   createOrder({ commit }, params) {
     return new Promise((resolve, reject) => {
-      // Recuperar o client_id do localStorage
+      // Recuperar o client_id e token do localStorage
       const clientId = localStorage.getItem('client_id');
-      
+      const token = localStorage.getItem('token'); // ajuste conforme o nome do token no seu localStorage
+  
       // Adicionar o client_id ao objeto params
       if (clientId) {
         params.client_id = clientId;
       }
   
+      // Requisição com token no header Authorization
       axios
-        .post(`${API_VERSION}/orders`, params)
+        .post(`${API_VERSION}/orders`, params, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
         .then((response) => {
           commit('CLEAR_CART');
           resolve(response.data.data);
@@ -95,6 +102,7 @@ const actions = {
         });
     });
   },
+  
   
 
   // Criar pedido autenticado
