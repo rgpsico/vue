@@ -200,6 +200,7 @@ export default {
         date: "",
         status: "",
         total: "",
+        eEntregador: "",
         client: {
           name: "",
           email: "",
