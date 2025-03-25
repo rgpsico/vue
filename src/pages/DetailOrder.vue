@@ -4,7 +4,7 @@
       <!-- Detalhes do Pedido -->
       <div class="col-12 mb-2">
         <h1 class="title-tenant h2">
-          Detalhes do Pedidos <strong>{{ identify }}</strong>
+          Detalhes do Pedido: <strong>{{ identify }}</strong>
         </h1>
       </div>
       <div class="col-sm-6">
@@ -30,7 +30,7 @@
               <li class="mt-3" id="codigo_entregador">
                 <div class="alert alert-warning text-center p-3">
                   <b class="d-block"
-                    >🚀 Código do Entregador aaa: {{order.eEntregador,}}</b
+                    >🚀 Código do Entregador: {{ order.eEntregador }}</b
                   >
                   <span class="fs-4 text-danger fw-bold">{{
                     order.codigo_entrega
