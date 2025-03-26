@@ -34,7 +34,7 @@
               >
                 <div class="alert alert-warning text-center p-3">
                   <b class="d-block">
-                    🚀 Código do Entregador:
+                    🚀 Código do Entregador: {{ order.eEntregador }}
                   </b>
                   <span class="fs-4 text-danger fw-bold">
                     {{ order.codigo_entrega }}
