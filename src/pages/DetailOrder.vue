@@ -27,10 +27,14 @@
             <ul class="p-0" v-if="order.client.name">
               <li><b>Nome:</b> {{ order.client.name }}</li>
               <li><b>E-mail:</b> {{ order.client.email }}</li>
-              <li class="mt-3" id="codigo_entregador" v-if="order.eEntregador">
+              <li
+                class="mt-3"
+                id="codigo_entregador"
+                v-if="order.eEntregador == 1"
+              >
                 <div class="alert alert-warning text-center p-3">
                   <b class="d-block">
-                    🚀 Código do Entregador: {{ order.eEntregador }}
+                    🚀 Código do Entregador:
                   </b>
                   <span class="fs-4 text-danger fw-bold">
                     {{ order.codigo_entrega }}
