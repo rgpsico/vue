@@ -27,14 +27,14 @@
             <ul class="p-0" v-if="order.client.name">
               <li><b>Nome:</b> {{ order.client.name }}</li>
               <li><b>E-mail:</b> {{ order.client.email }}</li>
-              <li class="mt-3" id="codigo_entregador">
+              <li class="mt-3" id="codigo_entregador" v-if="order.eEntregador">
                 <div class="alert alert-warning text-center p-3">
-                  <b class="d-block"
-                    >🚀 Código do Entregador: {{ order.eEntregador }}</b
-                  >
-                  <span class="fs-4 text-danger fw-bold">{{
-                    order.codigo_entrega
-                  }}</span>
+                  <b class="d-block">
+                    🚀 Código do Entregador: {{ order.eEntregador }}
+                  </b>
+                  <span class="fs-4 text-danger fw-bold">
+                    {{ order.codigo_entrega }}
+                  </span>
                   <p class="mt-2">
                     Por favor, entregue este código ao entregador no momento da
                     entrega.
