@@ -79,15 +79,17 @@ export default {
   props: ["companyFlag"],
 
   created() {
-    if (this.company.name === "") {
-      return this.$router.push({ name: "home" });
-    }
+    this.loadCompany().then(() => {
+      if (!this.company || !this.company.name) {
+        return this.$router.push({ name: "not-found" }); // ou 'home'
+      }
 
-    this.getCategoriesByCompany(this.company.uuid).catch((response) =>
-      this.$vToastify.error("Falha ao carregar categorias", "Erro")
-    );
+      this.getCategoriesByCompany(this.company.uuid).catch(() =>
+        this.$vToastify.error("Falha ao carregar categorias", "Erro")
+      );
 
-    this.loadProducts();
+      this.loadProducts();
+    });
   },
 
   computed: {
@@ -127,6 +129,13 @@ export default {
       this.getProductsByCompany(params).catch((response) =>
         this.$vToastify.error("falha ao carregar os produtos", "Erro")
       );
+    },
+    async loadCompany() {
+      try {
+        await this.getCompanyByFlag(this.companyFlag); // esse companyFlag vem da rota
+      } catch (error) {
+        this.$vToastify.error("Erro ao carregar empresa", "Erro");
+      }
     },
 
     filterByCategory(identify) {
