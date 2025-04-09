@@ -17,10 +17,6 @@ export default {
     SET_PRODUCTS_COMPANY (state, products) {
         state.companySelected.products = products
 
-    },
-
-    SET_COMPANY_SELECTED(state, company) {
-        state.companySelected = company
-      }
+    }
     
 }

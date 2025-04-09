@@ -70,26 +70,23 @@
 </template>
 
 <script>
-const host = window.location.hostname; // exemplo: delivery.comunidadeppg.com.br
-const path = window.location.pathname; // exemplo: /, /loja/favi-hamburgues
-
 import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   props: ["companyFlag"],
 
   created() {
-    this.loadCompany().then(() => {
-      if (!this.company || !this.company.uuid) {
-        return this.$router.push({ name: "not-found" }); // ou "home"
-      }
+    if (this.company.name === "") {
+      return this.$router.push({ name: "home" });
+    }
 
-      this.getCategoriesByCompany(this.company.uuid).catch(() =>
-        this.$vToastify.error("Falha ao carregar categorias", "Erro")
-      );
+    this.getCategoriesByCompany(this.company.uuid).catch((response) =>
+      this.$vToastify.error("Falha ao carregar categorias", "Erro")
+    );
 
-      this.loadProducts();
-    });
+    //  this.getProductsByCompany(this.company.uuid)
+    //.catch(response => this.$vToastify.error("Falha ao carregar produtos","Erro"))
+    this.loadProducts();
   },
 
   computed: {
@@ -109,25 +106,13 @@ export default {
   },
 
   methods: {
-    ...mapActions([
-      "getCategoriesByCompany",
-      "getProductsByCompany",
-      "  'getCompanyByFlag',",
-    ]),
+    ...mapActions(["getCategoriesByCompany", "getProductsByCompany"]),
 
     ...mapMutations({
       addProdCart: "ADD_PRODUCT_CART",
       removeTableCompany: "REMOVE_TABLE_COMPANY",
       removeCompany: "REMOVE_COMPANY_SELECTED",
     }),
-
-    async loadCompany() {
-      try {
-        await this.getCompanyByFlag(this.companyFlag); // companyFlag vem da rota
-      } catch (error) {
-        this.$vToastify.error("Empresa não encontrada", "Erro");
-      }
-    },
 
     loadProducts() {
       const params = {
