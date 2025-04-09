@@ -84,7 +84,9 @@ export default {
       this.$vToastify.error("Falha ao carregar categorias", "Erro")
     );
 
-    this.loadProducts();
+    setTimeout(() => {
+      this.loadProducts();
+    }, 2000);
   },
 
   computed: {
