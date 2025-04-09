@@ -70,23 +70,24 @@
 </template>
 
 <script>
+const host = window.location.hostname; // exemplo: delivery.comunidadeppg.com.br
+const path = window.location.pathname; // exemplo: /, /loja/favi-hamburgues
+
 import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   props: ["companyFlag"],
 
   created() {
-    // if (this.company.name === "") {
-    //   return this.$router.push({ name: "home" });
-    // }
+    if (this.company.name === "") {
+      return this.$router.push({ name: "home" });
+    }
 
     this.getCategoriesByCompany(this.company.uuid).catch((response) =>
       this.$vToastify.error("Falha ao carregar categorias", "Erro")
     );
 
-    setTimeout(() => {
-      this.loadProducts();
-    }, 2000);
+    this.loadProducts();
   },
 
   computed: {
@@ -115,10 +116,6 @@ export default {
     }),
 
     loadProducts() {
-      if (!this.company || !this.company.uuid) {
-        return;
-      }
-
       const params = {
         token_company: this.company.uuid,
       };
@@ -127,8 +124,8 @@ export default {
         params.categories = [this.filters.category];
       }
 
-      this.getProductsByCompany(params).catch(() =>
-        this.$vToastify.error("Falha ao carregar os produtos", "Erro")
+      this.getProductsByCompany(params).catch((response) =>
+        this.$vToastify.error("falha ao carregar os produtos", "Erro")
       );
     },
 
