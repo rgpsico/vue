@@ -76,9 +76,9 @@ export default {
   props: ["companyFlag"],
 
   created() {
-    if (this.company.name === "") {
-      return this.$router.push({ name: "home" });
-    }
+    // if (this.company.name === "") {
+    //   return this.$router.push({ name: "home" });
+    // }
 
     this.getCategoriesByCompany(this.company.uuid).catch((response) =>
       this.$vToastify.error("Falha ao carregar categorias", "Erro")
