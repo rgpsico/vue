@@ -115,6 +115,10 @@ export default {
     }),
 
     loadProducts() {
+      if (!this.company || !this.company.uuid) {
+        return;
+      }
+
       const params = {
         token_company: this.company.uuid,
       };
@@ -123,8 +127,8 @@ export default {
         params.categories = [this.filters.category];
       }
 
-      this.getProductsByCompany(params).catch((response) =>
-        this.$vToastify.error("falha ao carregar os produtos", "Erro")
+      this.getProductsByCompany(params).catch(() =>
+        this.$vToastify.error("Falha ao carregar os produtos", "Erro")
       );
     },
 
