@@ -27,6 +27,11 @@ export default {
 
     },
 
+    getCompanyByFlag({ commit }, companyFlag) {
+        return axios.get(`${API_VERSION}/tenants/${companyFlag}`)
+          .then(response => commit('SET_COMPANY_SELECTED', response.data))
+      },
+
     getProductsByCompany ({ commit }, params) {
         commit('SET_PRELOADER', true)
         commit('SET_TEXT_PRELOADER', 'Carregando os produtos')
