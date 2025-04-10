@@ -122,7 +122,7 @@ export default {
     async buscarEmpresaPorSlug(slug) {
       try {
         const response = await fetch(
-          `http://localhost:8000/api/empresa/${slug}/uuid`
+          `https://admindelivery.comunidadeppg.com.br/api/empresa/${slug}/uuid`
         );
         const data = await response.json();
 
