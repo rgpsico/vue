@@ -76,17 +76,22 @@ export default {
   props: ["companyFlag"],
 
   created() {
+    const slug = window.location.pathname
+      .split("/")
+      .filter(Boolean)
+      .pop();
+    console.log("Slug da empresa:", slug);
+
     if (this.company.name === "") {
-      return this.$router.push({ name: "home" });
+      this.buscarEmpresaPorSlug(slug);
+    } else {
+      // Caso já tenha o nome da empresa, segue normalmente
+      this.getCategoriesByCompany(this.company.uuid).catch((response) =>
+        this.$vToastify.error("Falha ao carregar categorias", "Erro")
+      );
+
+      this.loadProducts();
     }
-
-    this.getCategoriesByCompany(this.company.uuid).catch((response) =>
-      this.$vToastify.error("Falha ao carregar categorias", "Erro")
-    );
-
-    //  this.getProductsByCompany(this.company.uuid)
-    //.catch(response => this.$vToastify.error("Falha ao carregar produtos","Erro"))
-    this.loadProducts();
   },
 
   computed: {
@@ -114,6 +119,31 @@ export default {
       removeCompany: "REMOVE_COMPANY_SELECTED",
     }),
 
+    async buscarEmpresaPorSlug(slug) {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/api/empresa/${slug}/uuid`
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          this.company.uuid = data.uuid;
+          console.log("UUID da empresa:", this.company.uuid);
+          // Aqui você pode seguir com o restante das chamadas
+          this.getCategoriesByCompany(this.company.uuid);
+          this.loadProducts();
+        } else {
+          this.$vToastify.error(
+            data.message || "Erro ao buscar empresa",
+            "Erro"
+          );
+          this.$router.push({ name: "home" });
+        }
+      } catch (error) {
+        this.$vToastify.error("Erro na requisição", "Erro");
+        this.$router.push({ name: "home" });
+      }
+    },
     loadProducts() {
       const params = {
         token_company: this.company.uuid,
