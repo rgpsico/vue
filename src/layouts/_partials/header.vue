@@ -1,9 +1,5 @@
 <template>
   <header>
-    <!-- Meta tag para responsividade -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-ppgfood shadow-lg">
       <div class="container">
         <!-- Logo/Brand -->
@@ -14,7 +10,6 @@
             class="logo me-2"
             loading="lazy"
           >
-          <!-- <span class="brand-text d-none d-md-inline">PPGFOOD</span> -->
         </router-link>
 
         <!-- Mobile Toggle Button -->
@@ -22,9 +17,8 @@
           class="navbar-toggler border-0" 
           type="button" 
           @click="toggleMobileMenu"
-          :class="{ 'collapsed': !mobileMenuOpen }"
-          aria-expanded="false" 
-          aria-label="Toggle navigation"
+          :aria-expanded="mobileMenuOpen.toString()"
+          aria-label="Abrir menu"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -32,14 +26,14 @@
         <!-- Navigation Menu -->
         <div class="navbar-collapse" :class="{ 'show': mobileMenuOpen }" id="navbarNav">
           <ul class="navbar-nav ms-auto align-items-lg-center">
-            <!-- Search (opcional) -->
+            <!-- Search (opcional, só no mobile) -->
             <li class="nav-item d-lg-none mb-2">
               <form class="d-flex" role="search">
                 <input 
                   class="form-control form-control-sm me-2" 
                   type="search" 
                   placeholder="Buscar produtos..." 
-                  aria-label="Search"
+                  aria-label="Buscar"
                 >
                 <button class="btn btn-outline-light btn-sm" type="submit">
                   <i class="fas fa-search"></i>
@@ -53,6 +47,7 @@
                 :to="{name:'cart'}" 
                 class="nav-link position-relative cart-link"
                 :class="{ 'active': $route.name === 'cart' }"
+                aria-label="Ir para o carrinho"
               >
                 <i class="fas fa-shopping-cart me-1"></i>
                 <span class="d-lg-none">Carrinho</span>
@@ -74,43 +69,46 @@
                 id="userDropdown" 
                 role="button" 
                 @click.prevent="toggleUserMenu"
-                :class="{ 'show': userMenuOpen }"
-                aria-expanded="false"
+                :aria-expanded="userMenuOpen.toString()"
+                aria-label="Abrir menu do usuário"
               >
                 <div class="user-avatar me-2">
                   <i class="fas fa-user-circle"></i>
                 </div>
                 <span class="user-name">{{ me.name }}</span>
               </a>
-              <ul 
-                class="dropdown-menu dropdown-menu-end user-dropdown" 
-                :class="{ 'show': userMenuOpen }"
-                aria-labelledby="userDropdown"
-              >
-                <li>
-                  <router-link :to="{name:'my.orders'}" class="dropdown-item">
-                    <i class="fas fa-box me-2"></i>
-                    Meus Pedidos
-                  </router-link>
-                </li>
-                <li>
-                  <router-link :to="{name:'profile'}" class="dropdown-item">
-                    <i class="fas fa-user me-2"></i>
-                    Meu Perfil
-                  </router-link>
-                </li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                  <a 
-                    href="#" 
-                    class="dropdown-item text-danger" 
-                    @click.prevent="handleLogout"
-                  >
-                    <i class="fas fa-sign-out-alt me-2"></i>
-                    Sair
-                  </a>
-                </li>
-              </ul>
+              <transition name="fade">
+                <ul 
+                  v-show="userMenuOpen"
+                  class="dropdown-menu dropdown-menu-end user-dropdown"
+                  :class="{ 'show': userMenuOpen }"
+                  aria-labelledby="userDropdown"
+                >
+                  <li>
+                    <router-link :to="{name:'my.orders'}" class="dropdown-item">
+                      <i class="fas fa-box me-2"></i>
+                      Meus Pedidos
+                    </router-link>
+                  </li>
+                  <li>
+                    <router-link :to="{name:'profile'}" class="dropdown-item">
+                      <i class="fas fa-user me-2"></i>
+                      Meu Perfil
+                    </router-link>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a 
+                      href="#" 
+                      class="dropdown-item text-danger" 
+                      @click.prevent="handleLogout"
+                    >
+                      <i class="fas fa-sign-out-alt me-2"></i>
+                      Sair
+                    </a>
+                  </li>
+                </ul>
+              </transition>
             </li>
 
             <!-- Login Button -->
@@ -119,6 +117,7 @@
                 :to="{name:'login'}" 
                 class="nav-link login-btn"
                 :class="{ 'active': $route.name === 'login' }"
+                aria-label="Entrar"
               >
                 <i class="fas fa-sign-in-alt me-1"></i>
                 Entrar
@@ -158,12 +157,12 @@ export default {
 
     toggleMobileMenu() {
       this.mobileMenuOpen = !this.mobileMenuOpen
-      this.userMenuOpen = false // Fecha o menu do usuário
+      if (this.mobileMenuOpen) this.userMenuOpen = false
     },
 
     toggleUserMenu() {
       this.userMenuOpen = !this.userMenuOpen
-      this.mobileMenuOpen = false // Fecha o menu mobile
+      if (this.userMenuOpen) this.mobileMenuOpen = false
     },
 
     async handleLogout() {
@@ -176,31 +175,44 @@ export default {
       }
     },
 
-    // Fecha menus quando clica fora
     handleClickOutside(event) {
+      // Fecha user dropdown ao clicar fora dele
       const userDropdown = this.$el.querySelector('.user-dropdown')
       const userToggle = this.$el.querySelector('#userDropdown')
-      
-      if (userDropdown && !userDropdown.contains(event.target) && !userToggle.contains(event.target)) {
+      if (
+        this.userMenuOpen &&
+        userDropdown &&
+        !userDropdown.contains(event.target) &&
+        !userToggle.contains(event.target)
+      ) {
         this.userMenuOpen = false
+      }
+      // Fecha menu mobile ao clicar fora
+      const navbarCollapse = this.$el.querySelector('.navbar-collapse')
+      const toggler = this.$el.querySelector('.navbar-toggler')
+      if (
+        this.mobileMenuOpen &&
+        navbarCollapse &&
+        !navbarCollapse.contains(event.target) &&
+        !toggler.contains(event.target)
+      ) {
+        this.mobileMenuOpen = false
       }
     }
   },
 
   mounted() {
-    // Adiciona listener para fechar menus ao clicar fora
     document.addEventListener('click', this.handleClickOutside)
   },
 
   beforeUnmount() {
-    // Remove listener
     document.removeEventListener('click', this.handleClickOutside)
   }
 }
 </script>
 
 <style scoped>
-/* Variáveis CSS customizadas */
+/* Mesmas variáveis que você já usava */
 :root {
   --ppgfood-primary: #2c3e50;
   --ppgfood-secondary: #e74c3c;
@@ -208,23 +220,18 @@ export default {
   --transition-speed: 0.3s;
 }
 
-/* Navbar principal */
+/* Navbar */
 .bg-ppgfood {
-  background: linear-gradient(
-  135deg,
-  rgb(219, 19, 79) 0%,
-  rgb(150, 0, 50)   100%
-) !important;
+  background: linear-gradient(135deg, rgb(219, 19, 79) 0%, rgb(150, 0, 50) 100%) !important;
   backdrop-filter: blur(10px);
-  transition: all var(--transition-speed) ease;
 }
 
 .navbar {
-  padding: 0.75rem 0;
-  min-height: 70px;
+  padding: 0.6rem 0;
+  min-height: 65px;
 }
 
-/* Logo e Brand */
+/* Brand */
 .navbar-brand {
   font-weight: 700;
   font-size: 1.5rem;
@@ -232,47 +239,36 @@ export default {
 }
 
 .navbar-brand:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .logo {
-  height: 40px;
+  height: 36px;
   width: auto;
-  transition: all var(--transition-speed) ease;
 }
 
-.brand-text {
-  color: var(--ppgfood-accent);
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-/* Navigation Links */
+/* Nav links */
 .nav-link {
   font-weight: 500;
-  padding: 0.75rem 1rem !important;
+  padding: 0.65rem 1rem !important;
   border-radius: 8px;
   transition: all var(--transition-speed) ease;
-  position: relative;
   display: flex;
   align-items: center;
 }
 
 .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.12);
   transform: translateY(-2px);
 }
 
-.nav-link.active {
-  background-color: var(--ppgfood-secondary);
-  color: white !important;
+.nav-link.active,
+.login-btn.active {
+  background-color: var(--ppgfood-secondary) !important;
+  color: #fff !important;
 }
 
-/* Cart Badge */
-.cart-link {
-  position: relative;
-}
-
+/* Cart */
 .cart-badge {
   font-size: 0.75rem;
   min-width: 20px;
@@ -282,135 +278,116 @@ export default {
   justify-content: center;
   animation: pulse 2s infinite;
 }
-
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% { transform: scale(1);}
+  50% { transform: scale(1.1);}
+  100% { transform: scale(1);}
 }
 
-/* User Avatar */
+/* User menu */
 .user-avatar i {
   font-size: 1.5rem;
   color: var(--ppgfood-accent);
 }
-
 .user-name {
   font-weight: 600;
-  max-width: 120px;
+  max-width: 110px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-/* Dropdown Menu */
 .user-dropdown {
   border: none;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.18);
   border-radius: 12px;
-  padding: 0.5rem 0;
-  min-width: 200px;
-  background: white;
-  margin-top: 0.5rem;
+  padding: 0.4rem 0;
+  min-width: 185px;
+  background: #fff;
+  margin-top: 0.6rem;
+  z-index: 1200;
 }
 
 .dropdown-item {
-  padding: 0.75rem 1.5rem;
+  padding: 0.7rem 1.2rem;
   font-weight: 500;
-  transition: all var(--transition-speed) ease;
   display: flex;
   align-items: center;
+  transition: all var(--transition-speed) ease;
 }
 
 .dropdown-item:hover {
-  background-color: #f8f9fa;
-  padding-left: 2rem;
+  background: #f8f9fa;
+  padding-left: 1.8rem;
 }
 
 .dropdown-item i {
-  width: 20px;
-  text-align: center;
+  width: 22px;
 }
 
-/* Login Button */
+/* Login */
 .login-btn {
-  background-color: var(--ppgfood-secondary);
-  color: white !important;
-  border-radius: 25px;
+  background: var(--ppgfood-secondary);
+  color: #fff !important;
+  border-radius: 22px;
   font-weight: 600;
   margin-left: 0.5rem;
+  transition: all var(--transition-speed) ease;
 }
-
 .login-btn:hover {
-  background-color: #c0392b;
+  background: #c0392b;
+  box-shadow: 0 5px 14px rgba(231, 76, 60, 0.32);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
 }
 
-/* Mobile Toggle */
-.navbar-toggler {
-  padding: 0.25rem 0.5rem;
-  border-radius: 8px;
-}
-
-.navbar-toggler:focus {
-  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
-}
-
-/* Responsive */
+/* Mobile styles */
 @media (max-width: 991.98px) {
   .navbar-collapse {
-    background-color: rgba(44, 62, 80, 0.95);
+    background: rgba(44, 62, 80, 0.97);
     border-radius: 12px;
     margin-top: 1rem;
     padding: 1rem;
     backdrop-filter: blur(10px);
+    z-index: 1110;
   }
-  
   .nav-link {
-    margin: 0.25rem 0;
+    margin: 0.2rem 0;
   }
-  
   .user-dropdown {
     position: static !important;
-    float: none;
     width: 100%;
     margin-top: 0.5rem;
     box-shadow: none;
-    background-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.10);
+    color: #fff;
   }
-  
   .dropdown-item {
-    color: white;
+    color: #fff;
   }
-  
   .dropdown-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
   }
 }
 
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+/* Transições e fade do menu */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .user-dropdown {
-    background-color: #2c3e50;
-    color: white;
+    background: #2c3e50;
+    color: #fff;
   }
-  
   .dropdown-item {
-    color: white;
+    color: #fff;
   }
-  
   .dropdown-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.12);
   }
 }
 </style>
