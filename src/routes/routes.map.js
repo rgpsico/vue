@@ -6,7 +6,7 @@ import Register from '@/pages/Auth/Register'
 import MyOrders from '@/pages/Auth/MyOrders'
 import DetailOrder from '@/pages/DetailOrder'
 import PageNotFound from '@/pages/PageNotFound'
-
+import Profile from '@/pages/Profile'
 
 const routes = [
     {
@@ -19,6 +19,11 @@ const routes = [
                 name: 'order.detail',
                 props: true
 
+            },
+             {
+                path: '/perfil',
+                component: Profile,
+                name: 'profile'
             },
             {
                 path: '/meus-pedidos',
