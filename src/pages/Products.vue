@@ -318,6 +318,7 @@ export default {
     },
 
     handleImageError(event) {
+      return false;
       event.target.src = "/default-food.jpg";
     },
 
