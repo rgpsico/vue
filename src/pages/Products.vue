@@ -64,7 +64,6 @@
               </div>
               <span>Todas</span>
             </button>
-
             <button
               v-for="(category, index) in categories.data"
               :key="index"
@@ -143,12 +142,10 @@
                   :src="product.image || '/default-food.png'"
                   :alt="product.title"
                 />
-
                 <div class="product-badge" v-if="productInCart(product)">
                   <i class="fas fa-check"></i>
                 </div>
               </div>
-
               <div class="product-content">
                 <h4 class="product-title">{{ product.title }}</h4>
                 <p class="product-description" v-if="product.description">
@@ -157,13 +154,15 @@
                 <div class="product-price">
                   R$ {{ formatPrice(product.price) }}
                 </div>
+                <div class="product-stock" v-if="product.stock !== null">
+                  Estoque: {{ product.stock }}
+                </div>
               </div>
-
               <div class="product-actions">
                 <button
                   class="btn-add-cart"
                   @click="addProdCart(product)"
-                  :disabled="false"
+                  :disabled="product.stock <= 0"
                 >
                   <i
                     class="fas"
@@ -182,6 +181,32 @@
       </div>
     </div>
 
+    <!-- Floating Cart Button with Tooltip -->
+    <component
+      v-if="productsCart.length > 0"
+      :is="isAuthenticated ? 'router-link' : 'div'"
+      v-bind="isAuthenticated ? { to: { name: 'cart' } } : {}"
+      class="cart-float"
+      :class="{ 'not-authenticated': !isAuthenticated }"
+      @click="!isAuthenticated && handleCartClick()"
+      aria-label="Ir para o carrinho"
+    >
+      <i class="fas fa-shopping-cart"></i>
+      <span class="cart-count">{{ cartItemCount }}</span>
+      <div class="cart-tooltip" v-if="showCartTooltip">
+        <span>{{
+          isAuthenticated
+            ? "Clique aqui para ver o carrinho e ajustar quantidades!"
+            : "Clique no carrinho para ajustar quantidades!"
+        }}</span>
+        <span
+          class="tooltip-close"
+          @click.prevent.stop="showCartTooltip = false"
+          >×</span
+        >
+      </div>
+    </component>
+
     <!-- WhatsApp Floating Button -->
     <div class="whatsapp-float" v-if="company.whatsapp" @click="openWhatsApp">
       <i class="fab fa-whatsapp"></i>
@@ -194,28 +219,46 @@ import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   props: ["companyFlag"],
-
   data() {
     return {
       filters: {
         category: "",
       },
       loading: false,
+      showCartTooltip: false,
     };
   },
-
-  created() {
-    this.initializeComponent();
-  },
-
   computed: {
     ...mapState({
       company: (state) => state.companies.companySelected,
       categories: (state) => state.companies.categoriesCompanySelected,
       productsCart: (state) => state.cart.products,
+      isAuthenticated: (state) => state.auth.isAuthenticated,
     }),
+    cartItemCount() {
+      return this.productsCart.reduce(
+        (total, product) => total + (product.qty || 1),
+        0
+      );
+    },
   },
-
+  watch: {
+    productsCart: {
+      handler(newCart) {
+        if (newCart.length > 0) {
+          this.showCartTooltip = true;
+          setTimeout(() => {
+            this.showCartTooltip = false;
+          }, 5000); // Hide tooltip after 5 seconds
+        }
+      },
+      deep: true,
+    },
+  },
+  created() {
+    this.initializeComponent();
+  },
+  // Adicione este método no seu objeto methods existente
   methods: {
     ...mapActions(["getCategoriesByCompany", "getProductsByCompany"]),
     ...mapMutations({
@@ -225,9 +268,27 @@ export default {
       removeCompany: "REMOVE_COMPANY_SELECTED",
     }),
 
+    // Método para lidar com clique no carrinho quando não autenticado
+    handleCartClick() {
+      const token = localStorage.getItem("token_sanctum");
+
+      if (!token) {
+        this.$router.push({
+          name: "login",
+          query: { redirect: this.$route.fullPath },
+        });
+        return; // evita continuar a execução
+      }
+
+      // Se estiver autenticado, o router-link ou outra lógica segue normalmente
+    },
+
+    // Remova ou modifique o método goToCart existente (não é mais necessário)
+    // goToCart() { ... } <- pode remover este método
+
+    // ... resto dos seus métodos existentes permanecem iguais
     async initializeComponent() {
       const slug = window.location.pathname.split("/").filter(Boolean).pop();
-
       if (this.company.name === "") {
         await this.buscarEmpresaPorSlug(slug);
       } else {
@@ -251,7 +312,6 @@ export default {
           `https://admindelivery.comunidadeppg.com.br/api/empresa/${slug}/uuid`
         );
         const data = await response.json();
-
         if (response.ok) {
           this.company.uuid = data.uuid;
           await this.loadInitialData();
@@ -276,11 +336,9 @@ export default {
         const params = {
           token_company: this.company.uuid,
         };
-
         if (this.filters.category) {
           params.categories = [this.filters.category];
         }
-
         await this.getProductsByCompany(params);
       } catch (error) {
         this.$vToastify.error("Falha ao carregar produtos", "Erro");
@@ -308,17 +366,12 @@ export default {
       if (this.productInCart(product)) {
         this.removeProdCart(product.identify);
       } else {
-        this.$store.commit("ADD_PRODUCT_CART", product);
+        this.$store.commit("ADD_PRODUCT_CART", { ...product, qty: 1 });
       }
     },
 
     formatPrice(price) {
       return parseFloat(price).toFixed(2).replace(".", ",");
-    },
-
-    handleImageError(event) {
-      return false;
-      event.target.src = "/default-food.png";
     },
 
     openWhatsApp() {
@@ -330,10 +383,241 @@ export default {
       window.open(whatsappUrl, "_blank");
     },
   },
+  handleCartClick() {
+    if (this.isAuthenticated) {
+      // Se estiver autenticado, navegar para o carrinho
+      this.$router.push({ name: "cart" });
+    } else {
+      // Se não estiver autenticado, mostrar modal/tooltip de login
+      this.showLoginPrompt();
+      // ou redirecionar para login
+      // this.$router.push({ name: 'login' });
+    }
+  },
+
+  // Método original goToCart (pode ser removido se usar router-link)
+  goToCart() {
+    if (this.isAuthenticated) {
+      this.$router.push({ name: "cart" });
+    } else {
+      this.showLoginPrompt();
+    }
+  },
+
+  // Método para mostrar prompt de login
+  showLoginPrompt() {
+    // Implementar sua lógica de login aqui
+    // Exemplo: mostrar modal, tooltip, ou redirecionar
+    this.showCartTooltip = true;
+
+    // Opcional: redirecionar para login após um delay
+    setTimeout(() => {
+      this.$router.push({ name: "login" });
+    }, 2000);
+  },
 };
 </script>
 
 <style scoped>
+/* Carrinho Flutuante */
+.cart-float {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3), 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.cart-float:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4),
+    0 8px 20px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.cart-float:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+/* Ícone do Carrinho */
+.cart-float .fas.fa-shopping-cart {
+  font-size: 22px;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Contador de Itens */
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+  animation: pulse-count 2s infinite;
+}
+
+@keyframes pulse-count {
+  0%,
+  70%,
+  100% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.1);
+  }
+}
+
+/* Tooltip Informativo */
+.cart-tooltip {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: rgba(26, 32, 44, 0.95);
+  color: white;
+  padding: 15px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  max-width: 280px;
+  white-space: normal;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: tooltip-appear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: bottom right;
+}
+
+.cart-tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  border: 8px solid transparent;
+  border-top-color: rgba(26, 32, 44, 0.95);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes tooltip-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Botão de Fechar Tooltip */
+.tooltip-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.7);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.tooltip-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Responsivo para Mobile */
+@media (max-width: 768px) {
+  .cart-float {
+    bottom: 20px;
+    right: 20px;
+    width: 55px;
+    height: 55px;
+  }
+
+  .cart-float .fas.fa-shopping-cart {
+    font-size: 20px;
+  }
+
+  .cart-count {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    top: -3px;
+    right: -3px;
+  }
+
+  .cart-tooltip {
+    bottom: 65px;
+    right: -10px;
+    max-width: 250px;
+    font-size: 12px;
+    padding: 12px 15px;
+  }
+
+  .cart-tooltip::before {
+    right: 25px;
+    border-width: 6px;
+  }
+}
+
+/* Estados adicionais para melhor UX */
+.cart-float.cart-empty {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cart-float.cart-updating {
+  animation: cart-updating 1s infinite;
+}
+
+@keyframes cart-updating {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Efeito para quando o usuário não está logado */
+.cart-float.not-authenticated {
+  background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+}
+
+.cart-float.not-authenticated:hover {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+}
 .products-container {
   min-height: 100vh;
   background: #f8f9fa;
