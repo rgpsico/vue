@@ -85,7 +85,7 @@
         <div class="section-header">
           <h3 class="section-title">
             <i class="fas fa-utensils me-2"></i>
-            Cardápio
+            Produtos
           </h3>
           <div class="products-count" v-if="company.products.data.length > 0">
             {{ company.products.data.length }}
@@ -98,7 +98,7 @@
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Carregando produtos...</span>
           </div>
-          <p class="mt-3 text-muted">Carregando cardápio...</p>
+          <p class="mt-3 text-muted">Carregando Produtos...</p>
         </div>
 
         <!-- Empty State -->
@@ -140,9 +140,8 @@
               <div class="product-image-container">
                 <img
                   class="product-image"
-                  :src="product.image || '/default-food.jpg'"
+                  :src="product.image || '/default-food.png'"
                   :alt="product.title"
-                  @error="(event) => (event.target.src = '/default-food.jpg')"
                 />
 
                 <div class="product-badge" v-if="productInCart(product)">
@@ -319,7 +318,7 @@ export default {
 
     handleImageError(event) {
       return false;
-      event.target.src = "/default-food.jpg";
+      event.target.src = "/default-food.png";
     },
 
     openWhatsApp() {

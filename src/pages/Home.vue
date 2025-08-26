@@ -85,7 +85,7 @@
               <div class="card-action">
                 <button class="btn btn-primary btn-view-menu">
                   <i class="fas fa-utensils me-2"></i>
-                  Ver Cardápio
+                  Ver Produtos
                 </button>
               </div>
             </div>
