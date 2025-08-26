@@ -28,8 +28,8 @@
           </div>
           <div class="col-lg-4 col-md-5 text-end">
             <div class="company-actions">
-              <button 
-                class="btn btn-whatsapp btn-lg" 
+              <button
+                class="btn btn-whatsapp btn-lg"
                 @click="openWhatsApp"
                 v-if="company.whatsapp"
               >
@@ -88,8 +88,8 @@
             Cardápio
           </h3>
           <div class="products-count" v-if="company.products.data.length > 0">
-            {{ company.products.data.length }} 
-            {{ company.products.data.length === 1 ? 'produto' : 'produtos' }}
+            {{ company.products.data.length }}
+            {{ company.products.data.length === 1 ? "produto" : "produtos" }}
           </div>
         </div>
 
@@ -102,16 +102,23 @@
         </div>
 
         <!-- Empty State -->
-        <div class="empty-state text-center py-5" v-else-if="company.products.data.length === 0">
+        <div
+          class="empty-state text-center py-5"
+          v-else-if="company.products.data.length === 0"
+        >
           <div class="empty-icon">
             <i class="fas fa-utensils"></i>
           </div>
           <h4 class="mt-3">Nenhum produto encontrado</h4>
           <p class="text-muted">
-            {{ filters.category ? 'Tente selecionar outra categoria' : 'Este restaurante ainda não possui produtos cadastrados' }}
+            {{
+              filters.category
+                ? "Tente selecionar outra categoria"
+                : "Este restaurante ainda não possui produtos cadastrados"
+            }}
           </p>
-          <button 
-            class="btn btn-outline-primary" 
+          <button
+            class="btn btn-outline-primary"
             @click="filterByCategory('')"
             v-if="filters.category"
           >
@@ -126,11 +133,14 @@
             v-for="(product, index) in company.products.data"
             :key="index"
           >
-            <div class="product-card" :class="{ 'in-cart': productInCart(product) }">
+            <div
+              class="product-card"
+              :class="{ 'in-cart': productInCart(product) }"
+            >
               <div class="product-image-container">
-                <img 
-                  class="product-image" 
-                  :src="product.image || '/default-food.jpg'" 
+                <img
+                  class="product-image"
+                  :src="product.image || '/default-food.jpg'"
                   :alt="product.title"
                   @error="handleImageError"
                 />
@@ -138,7 +148,7 @@
                   <i class="fas fa-check"></i>
                 </div>
               </div>
-              
+
               <div class="product-content">
                 <h4 class="product-title">{{ product.title }}</h4>
                 <p class="product-description" v-if="product.description">
@@ -148,16 +158,21 @@
                   R$ {{ formatPrice(product.price) }}
                 </div>
               </div>
-              
+
               <div class="product-actions">
-                <button 
+                <button
                   class="btn-add-cart"
                   @click="addProdCart(product)"
-                  :disabled="productInCart(product)"
+                  :disabled="false"
                 >
-                  <i class="fas" :class="productInCart(product) ? 'fa-check' : 'fa-cart-plus'"></i>
+                  <i
+                    class="fas"
+                    :class="
+                      productInCart(product) ? 'fa-check' : 'fa-cart-plus'
+                    "
+                  ></i>
                   <span>
-                    {{ productInCart(product) ? 'Adicionado' : 'Adicionar' }}
+                    {{ productInCart(product) ? "Adicionado" : "Adicionar" }}
                   </span>
                 </button>
               </div>
@@ -205,15 +220,13 @@ export default {
     ...mapActions(["getCategoriesByCompany", "getProductsByCompany"]),
     ...mapMutations({
       addProdCart: "ADD_PRODUCT_CART",
+      removeProdCart: "REMOVE_PRODUCT_CART",
       removeTableCompany: "REMOVE_TABLE_COMPANY",
       removeCompany: "REMOVE_COMPANY_SELECTED",
     }),
 
     async initializeComponent() {
-      const slug = window.location.pathname
-        .split("/")
-        .filter(Boolean)
-        .pop();
+      const slug = window.location.pathname.split("/").filter(Boolean).pop();
 
       if (this.company.name === "") {
         await this.buscarEmpresaPorSlug(slug);
@@ -291,19 +304,29 @@ export default {
       );
     },
 
+    addProdCart(product) {
+      if (this.productInCart(product)) {
+        this.removeProdCart(product.identify);
+      } else {
+        this.$store.commit("ADD_PRODUCT_CART", product);
+      }
+    },
+
     formatPrice(price) {
-      return parseFloat(price).toFixed(2).replace('.', ',');
+      return parseFloat(price).toFixed(2).replace(".", ",");
     },
 
     handleImageError(event) {
-      event.target.src = '/default-food.jpg';
+      event.target.src = "/default-food.jpg";
     },
 
     openWhatsApp() {
       const phone = this.company.whatsapp || this.company.phone;
       const message = `Olá! Gostaria de fazer um pedido no ${this.company.name}`;
-      const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
+      const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(
+        message
+      )}`;
+      window.open(whatsappUrl, "_blank");
     },
   },
 };
@@ -319,7 +342,7 @@ export default {
 .company-header {
   background: white;
   padding: 2rem 0;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
 }
 
@@ -486,7 +509,7 @@ export default {
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -494,7 +517,7 @@ export default {
 
 .product-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .product-card.in-cart {
@@ -624,40 +647,40 @@ export default {
   .products-container {
     padding-top: 70px;
   }
-  
+
   .company-header {
     padding: 1.5rem 0;
   }
-  
+
   .company-name {
     font-size: 2rem;
   }
-  
+
   .company-details {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .company-actions {
     text-align: center;
     margin-top: 1rem;
   }
-  
+
   .section-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .products-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .categories-container {
     padding: 0.5rem 1rem;
   }
-  
+
   .whatsapp-float {
     bottom: 20px;
     right: 20px;

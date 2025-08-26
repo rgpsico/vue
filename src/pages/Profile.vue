@@ -175,64 +175,116 @@ export default {
 </script>
 
 <style scoped>
-/* Container principal */
+/* Container principal com efeito de vidro */
 .container {
-  padding: 2rem; /* aumenta o padding interno */
-  background-color: rgba(
-    255,
-    255,
-    255,
-    0.95
-  ); /* deixa um pouco mais branco para destacar */
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s ease;
 }
 
-/* Texto das informações adicionais */
-p {
-  font-size: 1rem;
-  color: #4b5563; /* cinza escuro para melhor leitura */
-  line-height: 1.6;
+/* Efeito hover suave no container */
+.container:hover {
+  transform: translateY(-5px);
 }
 
-/* Títulos fortes das informações */
-p strong {
-  color: #f97316; /* laranja para destacar */
-  font-weight: 600;
+/* Cabeçalho com gradiente animado */
+.bg-gradient-to-r {
+  background-size: 200% auto;
+  animation: gradientShift 5s ease infinite;
 }
 
-/* Espaçamento entre os itens das informações */
-.space-y-4 > p {
-  margin-bottom: 0.75rem;
-}
-
-/* Botões */
-button {
-  min-width: 160px; /* deixa os botões maiores e mais fáceis de clicar */
-}
-
-/* Ajuste para o header */
-.relative.z-10 {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
-}
-
-/* Avatar */
+/* Avatar com borda brilhante */
 .relative.w-24 {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* sombra mais visível */
+  border: 4px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
+  transition: all 0.3s ease;
 }
 
-/* Pequeno destaque no hover do avatar */
+/* Efeito hover no avatar */
 .relative.w-24:hover {
-  transform: scale(1.1);
+  transform: scale(1.05) rotate(5deg);
+  border-color: #f97316;
 }
 
-/* Deixa o background da seção principal mais contrastante */
-.min-h-screen {
-  background: linear-gradient(
-    to bottom right,
-    #fef3c7,
-    #fb923c
-  ); /* amarelo + laranja suave */
+/* Estilo para informações adicionais */
+.space-y-4 > p {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(249, 115, 22, 0.05);
+  transition: all 0.2s ease;
 }
 
-/* Aqui você mantém suas animações, hover effects e scrollbar customizada */
+/* Hover nas informações */
+.space-y-4 > p:hover {
+  background-color: rgba(249, 115, 22, 0.1);
+  transform: translateX(10px);
+}
+
+/* Estilo para títulos fortes */
+p strong {
+  color: #f97316;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* Botões com efeito de elevação */
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efeito hover nos botões */
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Animação do gradiente */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Status online com animação de pulso */
+.bg-green-400 {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Media queries para responsividade */
+@media (max-width: 640px) {
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .space-y-4 > p {
+    padding: 8px;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
 </style>

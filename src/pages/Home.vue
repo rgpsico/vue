@@ -5,26 +5,28 @@
       <div class="col-12">
         <div class="page-header text-center mb-5">
           <h1 class="display-4 title-gradient">Restaurantes</h1>
-          <p class="lead text-muted">Descubra os melhores sabores da sua região</p>
+          <p class="lead text-muted">
+            Descubra os melhores sabores da sua região
+          </p>
         </div>
-        
+
         <!-- Search and Filter Section -->
         <div class="search-section mb-5">
           <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
               <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
-                <input 
-                  type="text" 
-                  class="form-control search-input" 
+                <input
+                  type="text"
+                  class="form-control search-input"
                   placeholder="Buscar restaurantes..."
                   v-model="searchTerm"
-                >
+                />
               </div>
             </div>
           </div>
         </div>
-        
+
         <!-- Loading State -->
         <div class="text-center py-5" v-if="loading">
           <div class="spinner-border text-primary" role="status">
@@ -32,7 +34,7 @@
           </div>
           <p class="mt-3 text-muted">Carregando restaurantes...</p>
         </div>
-        
+
         <!-- Restaurants Grid -->
         <div class="restaurants-grid" v-else>
           <div
@@ -58,7 +60,7 @@
                   <i class="fas fa-eye view-icon"></i>
                 </div>
               </div>
-              
+
               <div class="card-content">
                 <h3 class="restaurant-name">{{ company.name }}</h3>
                 <p class="restaurant-description" v-if="company.description">
@@ -79,7 +81,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <div class="card-action">
                 <button class="btn btn-primary btn-view-menu">
                   <i class="fas fa-utensils me-2"></i>
@@ -89,13 +91,18 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Empty State -->
-        <div class="text-center py-5" v-if="!loading && filteredCompanies.length === 0">
+        <div
+          class="text-center py-5"
+          v-if="!loading && filteredCompanies.length === 0"
+        >
           <div class="empty-state">
             <i class="fas fa-store-slash empty-icon"></i>
             <h3 class="mt-3">Nenhum restaurante encontrado</h3>
-            <p class="text-muted">Tente ajustar sua busca ou verifique novamente mais tarde.</p>
+            <p class="text-muted">
+              Tente ajustar sua busca ou verifique novamente mais tarde.
+            </p>
           </div>
         </div>
       </div>
@@ -109,39 +116,39 @@ import { mapActions, mapState, mapMutations } from "vuex";
 export default {
   data() {
     return {
-      searchTerm: '',
-      loading: true
-    }
+      searchTerm: "",
+      loading: true,
+    };
   },
-  
+
   mounted() {
     this.loadCompanies();
   },
-  
+
   computed: {
     ...mapState({
       companies: (state) => state.companies.items,
     }),
-    
+
     filteredCompanies() {
       if (!this.companies.data) return [];
-      
+
       if (!this.searchTerm) {
         return this.companies.data;
       }
-      
-      return this.companies.data.filter(company =>
+
+      return this.companies.data.filter((company) =>
         company.name.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
-    }
+    },
   },
-  
+
   methods: {
     ...mapActions(["getCompanies"]),
     ...mapMutations({
       setCompany: "SET_COMPANY_SELECTED",
     }),
-    
+
     async loadCompanies() {
       try {
         this.loading = true;
@@ -152,7 +159,7 @@ export default {
         this.loading = false;
       }
     },
-    
+
     goStoreCompany(company) {
       this.setCompany(company);
       this.$router.push({
@@ -192,7 +199,7 @@ export default {
   border: none;
   border-radius: 50px;
   font-size: 1.1rem;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
@@ -225,7 +232,7 @@ export default {
   background: white;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
   width: 100%;
@@ -235,7 +242,7 @@ export default {
 
 .restaurant-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
 
 .card-image-container {
@@ -343,18 +350,18 @@ export default {
   .restaurants-container {
     padding-top: 80px;
   }
-  
+
   .restaurants-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     padding: 0 0.5rem;
   }
-  
+
   .search-input {
     font-size: 1rem;
     padding: 12px 15px 12px 45px;
   }
-  
+
   .restaurant-info {
     flex-direction: column;
     gap: 0.5rem;
@@ -365,11 +372,11 @@ export default {
   .card-content {
     padding: 1rem;
   }
-  
+
   .restaurant-name {
     font-size: 1.2rem;
   }
-  
+
   .card-action {
     padding: 0 1rem 1rem;
   }
