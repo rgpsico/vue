@@ -142,8 +142,9 @@
                   class="product-image"
                   :src="product.image || '/default-food.jpg'"
                   :alt="product.title"
-                  @error="handleImageError"
+                  @error="(event) => (event.target.src = '/default-food.jpg')"
                 />
+
                 <div class="product-badge" v-if="productInCart(product)">
                   <i class="fas fa-check"></i>
                 </div>
