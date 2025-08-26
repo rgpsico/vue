@@ -85,7 +85,7 @@
         <div class="section-header">
           <h3 class="section-title">
             <i class="fas fa-utensils me-2"></i>
-            Produtos
+            Cardápio
           </h3>
           <div class="products-count" v-if="company.products.data.length > 0">
             {{ company.products.data.length }}
@@ -98,7 +98,7 @@
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Carregando produtos...</span>
           </div>
-          <p class="mt-3 text-muted">Carregando Produtos...</p>
+          <p class="mt-3 text-muted">Carregando cardápio...</p>
         </div>
 
         <!-- Empty State -->
