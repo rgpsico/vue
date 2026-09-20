@@ -16,6 +16,7 @@
         </div>
       </div>
       <div class="container store-header-content">
+        <div class="calcadao-pattern" :style="{ backgroundImage: 'url(' + calcadaoPattern + ')' }"></div>
         <h1 class="store-name">{{ company.name }}</h1>
         <div class="store-meta">
           <span class="store-location" v-if="company.location_label">
@@ -179,6 +180,7 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
+import calcadaoPattern from "@/assets/imgs/calcadao-pattern.webp";
 
 export default {
   props: ["companyFlag"],
@@ -191,6 +193,7 @@ export default {
       loading: false,
       placeholderImage:
         "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' fill='%23f1f2f4'/%3E%3C/svg%3E",
+      calcadaoPattern,
     };
   },
   computed: {
@@ -403,8 +406,25 @@ export default {
 }
 
 .store-header-content {
+  position: relative;
   padding: 2.75rem 1rem 1rem;
   text-align: center;
+  overflow: hidden;
+}
+
+.calcadao-pattern {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(45%, 320px);
+  background-size: 140px;
+  background-repeat: repeat;
+  background-position: center;
+  opacity: 0.5;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to left, #000 0%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 0%, transparent 100%);
 }
 
 .store-name {
@@ -813,6 +833,12 @@ export default {
   .product-item:nth-child(odd) {
     border-right: 1px solid #f0f0f0;
   }
+
+  .calcadao-pattern {
+    width: min(38%, 420px);
+    background-size: 180px;
+    opacity: 0.6;
+  }
 }
 
 @media (max-width: 480px) {
@@ -827,6 +853,18 @@ export default {
 
   .store-name {
     font-size: 1.25rem;
+  }
+
+  .calcadao-pattern {
+    width: 55%;
+    opacity: 0.35;
+    background-size: 90px;
+  }
+}
+
+@media (max-width: 340px) {
+  .calcadao-pattern {
+    display: none;
   }
 
   .product-image-box {
