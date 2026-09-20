@@ -41,86 +41,85 @@
               </form>
             </li>
 
-            <!-- Cart -->
-            <li class="nav-item">
-              <router-link 
-                :to="{name:'cart'}" 
-                class="nav-link position-relative cart-link"
+            <!-- Actions cluster: cart + login/user -->
+            <li class="nav-item d-flex align-items-center actions-cluster">
+              <router-link
+                :to="{name:'cart'}"
+                class="cart-button"
                 :class="{ 'active': $route.name === 'cart' }"
                 aria-label="Ir para o carrinho"
               >
-                <i class="fas fa-shopping-cart me-1"></i>
-                <span class="d-lg-none">Carrinho</span>
-                <span 
-                  v-if="productsCart.length > 0" 
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge"
+                <i class="fas fa-shopping-cart"></i>
+                <span class="d-lg-none ms-2">Carrinho</span>
+                <span
+                  v-if="productsCart.length > 0"
+                  class="cart-badge"
                 >
                   {{ productsCart.length }}
                   <span class="visually-hidden">itens no carrinho</span>
                 </span>
               </router-link>
-            </li>
 
-            <!-- User Menu -->
-            <li class="nav-item dropdown" v-if="me.name">
-              <a 
-                class="nav-link dropdown-toggle d-flex align-items-center" 
-                href="#" 
-                id="userDropdown" 
-                role="button" 
-                @click.prevent="toggleUserMenu"
-                :aria-expanded="userMenuOpen.toString()"
-                aria-label="Abrir menu do usuário"
-              >
-                <div class="user-avatar me-2">
-                  <i class="fas fa-user-circle"></i>
-                </div>
-                <span class="user-name">{{ me.name }}</span>
-              </a>
-              <transition name="fade">
-                <ul 
-                  v-show="userMenuOpen"
-                  class="dropdown-menu dropdown-menu-end user-dropdown"
-                  :class="{ 'show': userMenuOpen }"
-                  aria-labelledby="userDropdown"
+              <!-- User Menu -->
+              <div class="dropdown user-menu" v-if="me.name">
+                <a
+                  class="user-toggle d-flex align-items-center"
+                  href="#"
+                  id="userDropdown"
+                  role="button"
+                  @click.prevent="toggleUserMenu"
+                  :aria-expanded="userMenuOpen.toString()"
+                  aria-label="Abrir menu do usuário"
                 >
-                  <li>
-                    <router-link :to="{name:'my.orders'}" class="dropdown-item">
-                      <i class="fas fa-box me-2"></i>
-                      Meus Pedidos
-                    </router-link>
-                  </li>
-                  <li>
-                    <router-link :to="{name:'profile'}" class="dropdown-item">
-                      <i class="fas fa-user me-2"></i>
-                      Meu Perfil
-                    </router-link>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li>
-                    <a 
-                      href="#" 
-                      class="dropdown-item text-danger" 
-                      @click.prevent="handleLogout"
-                    >
-                      <i class="fas fa-sign-out-alt me-2"></i>
-                      Sair
-                    </a>
-                  </li>
-                </ul>
-              </transition>
-            </li>
+                  <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <span class="user-name d-none d-lg-inline">{{ me.name }}</span>
+                </a>
+                <transition name="fade">
+                  <ul
+                    v-show="userMenuOpen"
+                    class="dropdown-menu dropdown-menu-end user-dropdown"
+                    :class="{ 'show': userMenuOpen }"
+                    aria-labelledby="userDropdown"
+                  >
+                    <li>
+                      <router-link :to="{name:'my.orders'}" class="dropdown-item">
+                        <i class="fas fa-box me-2"></i>
+                        Meus Pedidos
+                      </router-link>
+                    </li>
+                    <li>
+                      <router-link :to="{name:'profile'}" class="dropdown-item">
+                        <i class="fas fa-user me-2"></i>
+                        Meu Perfil
+                      </router-link>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                      <a
+                        href="#"
+                        class="dropdown-item text-danger"
+                        @click.prevent="handleLogout"
+                      >
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Sair
+                      </a>
+                    </li>
+                  </ul>
+                </transition>
+              </div>
 
-            <!-- Login Button -->
-            <li class="nav-item" v-else>
-              <router-link 
-                :to="{name:'login'}" 
-                class="nav-link login-btn"
+              <!-- Login Button -->
+              <router-link
+                v-else
+                :to="{name:'login'}"
+                class="login-btn"
                 :class="{ 'active': $route.name === 'login' }"
                 aria-label="Entrar"
               >
-                <i class="fas fa-sign-in-alt me-1"></i>
-                Entrar
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Entrar</span>
               </router-link>
             </li>
           </ul>
@@ -212,18 +211,16 @@ export default {
 </script>
 
 <style scoped>
-/* Mesmas variáveis que você já usava */
 :root {
   --ppgfood-primary: #2c3e50;
-  --ppgfood-secondary: #e74c3c;
-  --ppgfood-accent: #f39c12;
+  --ppgfood-secondary: #ff6b35;
+  --ppgfood-accent: #ff6b35;
   --transition-speed: 0.3s;
 }
 
 /* Navbar */
 .bg-ppgfood {
-  background: linear-gradient(135deg, rgb(219, 19, 79) 0%, rgb(150, 0, 50) 100%) !important;
-  backdrop-filter: blur(10px);
+  background: #b3134f !important;
 }
 
 .navbar {
@@ -262,20 +259,53 @@ export default {
   transform: translateY(-2px);
 }
 
-.nav-link.active,
-.login-btn.active {
-  background-color: var(--ppgfood-secondary) !important;
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.16) !important;
   color: #fff !important;
 }
 
-/* Cart */
+/* Actions cluster (cart + login/user) */
+.actions-cluster {
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.cart-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: all var(--transition-speed) ease;
+}
+
+.cart-button:hover,
+.cart-button.active {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
 .cart-badge {
-  font-size: 0.75rem;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--ppgfood-accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
   min-width: 20px;
   height: 20px;
+  border-radius: 999px;
+  border: 2px solid #b3134f;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 4px;
   animation: pulse 2s infinite;
 }
 @keyframes pulse {
@@ -285,12 +315,41 @@ export default {
 }
 
 /* User menu */
-.user-avatar i {
-  font-size: 1.5rem;
-  color: var(--ppgfood-accent);
+.user-menu {
+  position: relative;
 }
+
+.user-toggle {
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  transition: all var(--transition-speed) ease;
+}
+
+.user-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ppgfood-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar i {
+  font-size: 0.9rem;
+  color: #fff;
+}
+
 .user-name {
   font-weight: 600;
+  color: #fff;
   max-width: 110px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -326,17 +385,25 @@ export default {
 
 /* Login */
 .login-btn {
-  background: var(--ppgfood-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--ppgfood-accent);
   color: #fff !important;
-  border-radius: 22px;
+  text-decoration: none;
+  border-radius: 999px;
   font-weight: 600;
-  margin-left: 0.5rem;
+  font-size: 0.95rem;
+  padding: 0.55rem 1.1rem;
   transition: all var(--transition-speed) ease;
 }
 .login-btn:hover {
-  background: #c0392b;
-  box-shadow: 0 5px 14px rgba(231, 76, 60, 0.32);
+  background: #e85a2a;
+  box-shadow: 0 5px 14px rgba(255, 107, 53, 0.4);
   transform: translateY(-2px);
+}
+.login-btn.active {
+  background: #e85a2a;
 }
 
 /* Mobile styles */
@@ -351,6 +418,15 @@ export default {
   }
   .nav-link {
     margin: 0.2rem 0;
+  }
+  .actions-cluster {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    justify-content: space-between;
+  }
+  .cart-button {
+    flex: 1;
+    justify-content: center;
   }
   .user-dropdown {
     position: static !important;
