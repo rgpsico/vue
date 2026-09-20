@@ -192,12 +192,6 @@ export default {
 
       const asaasKey = localStorage.getItem("asaas_key");
 
-      if (!asaasKey) {
-        this.$vToastify.error("Erro ao obter chave Asaas", "Erro");
-        this.loading = false;
-        return;
-      }
-
       let params = {
         token_company: this.company.uuid,
         asaas_key: asaasKey,
@@ -208,6 +202,12 @@ export default {
       };
 
       if (this.paymentMethod === "pix") {
+        if (!asaasKey) {
+          this.$vToastify.error("Erro ao obter chave Asaas", "Erro");
+          this.loading = false;
+          return;
+        }
+
         this.generatePixQrCode(params, asaasKey)
           .then((qrCodeUrl) => {
             this.qrCodeUrl = qrCodeUrl;
