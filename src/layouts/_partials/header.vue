@@ -12,27 +12,46 @@
           >
         </router-link>
 
-        <!-- Mobile Toggle Button -->
-        <button 
-          class="navbar-toggler border-0" 
-          type="button" 
-          @click="toggleMobileMenu"
-          :aria-expanded="mobileMenuOpen.toString()"
-          aria-label="Abrir menu"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <!-- Always-visible actions: cart + mobile toggle -->
+        <div class="d-flex align-items-center order-lg-2 top-actions">
+          <router-link
+            :to="{name:'cart'}"
+            class="cart-icon-button"
+            :class="{ 'active': $route.name === 'cart' }"
+            aria-label="Ir para o carrinho"
+          >
+            <i class="fas fa-shopping-cart"></i>
+            <span
+              v-if="productsCart.length > 0"
+              class="cart-badge"
+            >
+              {{ productsCart.length }}
+              <span class="visually-hidden">itens no carrinho</span>
+            </span>
+          </router-link>
+
+          <!-- Mobile Toggle Button -->
+          <button
+            class="navbar-toggler border-0"
+            type="button"
+            @click="toggleMobileMenu"
+            :aria-expanded="mobileMenuOpen.toString()"
+            aria-label="Abrir menu"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
 
         <!-- Navigation Menu -->
-        <div class="navbar-collapse" :class="{ 'show': mobileMenuOpen }" id="navbarNav">
+        <div class="navbar-collapse order-lg-1" :class="{ 'show': mobileMenuOpen }" id="navbarNav">
           <ul class="navbar-nav ms-auto align-items-lg-center">
             <!-- Search (opcional, só no mobile) -->
             <li class="nav-item d-lg-none mb-2">
               <form class="d-flex" role="search">
-                <input 
-                  class="form-control form-control-sm me-2" 
-                  type="search" 
-                  placeholder="Buscar produtos..." 
+                <input
+                  class="form-control form-control-sm me-2"
+                  type="search"
+                  placeholder="Buscar produtos..."
                   aria-label="Buscar"
                 >
                 <button class="btn btn-outline-light btn-sm" type="submit">
@@ -41,25 +60,8 @@
               </form>
             </li>
 
-            <!-- Actions cluster: cart + login/user -->
+            <!-- User Menu / Login -->
             <li class="nav-item d-flex align-items-center actions-cluster">
-              <router-link
-                :to="{name:'cart'}"
-                class="cart-button"
-                :class="{ 'active': $route.name === 'cart' }"
-                aria-label="Ir para o carrinho"
-              >
-                <i class="fas fa-shopping-cart"></i>
-                <span class="d-lg-none ms-2">Carrinho</span>
-                <span
-                  v-if="productsCart.length > 0"
-                  class="cart-badge"
-                >
-                  {{ productsCart.length }}
-                  <span class="visually-hidden">itens no carrinho</span>
-                </span>
-              </router-link>
-
               <!-- User Menu -->
               <div class="dropdown user-menu" v-if="me.name">
                 <a
@@ -264,30 +266,34 @@ export default {
   color: #fff !important;
 }
 
-/* Actions cluster (cart + login/user) */
-.actions-cluster {
-  gap: 0.5rem;
-  margin-left: 0.5rem;
+/* Top-right actions: always-visible cart icon + mobile toggler */
+.top-actions {
+  gap: 0.75rem;
 }
 
-.cart-button {
+.cart-icon-button {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   color: #fff;
+  font-size: 1.15rem;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.55rem 0.9rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
   transition: all var(--transition-speed) ease;
 }
 
-.cart-button:hover,
-.cart-button.active {
-  background: rgba(255, 255, 255, 0.22);
+.cart-icon-button:hover,
+.cart-icon-button.active {
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
+}
+
+/* Login/user cluster (inside the collapsible menu) */
+.actions-cluster {
+  gap: 0.5rem;
 }
 
 .cart-badge {
@@ -420,12 +426,17 @@ export default {
     margin: 0.2rem 0;
   }
   .actions-cluster {
-    margin-left: 0;
     margin-top: 0.5rem;
-    justify-content: space-between;
   }
-  .cart-button {
-    flex: 1;
+  .login-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .user-menu {
+    width: 100%;
+  }
+  .user-toggle {
+    width: 100%;
     justify-content: center;
   }
   .user-dropdown {
