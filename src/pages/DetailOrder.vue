@@ -315,8 +315,6 @@ export default {
       return `${day}/${month}/${year}`;
     },
     enviarMensagem() {
-      const url = "http://127.0.0.1:8000/api/batepapo/enviarmensagem";
-
       // Dados que serão enviados no POST
       const payload = {
         user_id: this.identify,
@@ -325,7 +323,7 @@ export default {
 
       // Fazendo a requisição POST
       axios
-        .post(url, payload)
+        .post("batepapo/enviarmensagem", payload)
         .then((response) => {
           // Lida com a resposta positiva da requisição
           console.log("Pedido enviado com sucesso:", response.data);

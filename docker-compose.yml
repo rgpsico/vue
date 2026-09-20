@@ -1,0 +1,14 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: ppgfood_frontend
+    ports:
+      - "8081:80"
+    networks:
+      - proxy_net
+
+networks:
+  proxy_net:
+    external: true
