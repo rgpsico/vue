@@ -2,32 +2,30 @@
   <div class="store-page">
     <!-- Store Header -->
     <header class="store-header">
-      <div class="store-cover"></div>
-      <div class="container store-header-content">
-        <div class="store-avatar">
-          <img
-            v-if="company.image"
-            :src="company.image"
-            :alt="company.name"
-          />
-          <span v-else>{{ storeInitials }}</span>
+      <div
+        class="store-cover"
+        :class="{ 'has-photo': company.cover_image }"
+        :style="
+          company.cover_image
+            ? { backgroundImage: 'url(' + company.cover_image + ')' }
+            : {}
+        "
+      >
+        <div class="store-avatar" v-if="company.image">
+          <img :src="company.image" :alt="company.name" />
         </div>
-        <div class="store-info">
-          <h1 class="store-name">{{ company.name }}</h1>
-          <div class="store-meta">
-            <span class="store-status">
-              <span class="status-dot"></span>
-              Aberto agora
-            </span>
-            <a
-              v-if="company.contact"
-              class="store-contact"
-              :href="'mailto:' + company.contact"
-            >
-              <i class="fa-regular fa-envelope"></i>
-              {{ company.contact }}
-            </a>
-          </div>
+      </div>
+      <div class="container store-header-content">
+        <h1 class="store-name">{{ company.name }}</h1>
+        <div class="store-meta">
+          <span class="store-location" v-if="company.location_label">
+            <i class="fa-solid fa-location-dot"></i>
+            {{ company.location_label }}
+          </span>
+          <span class="store-status">
+            <span class="status-dot"></span>
+            Aberto
+          </span>
         </div>
       </div>
     </header>
@@ -202,9 +200,6 @@ export default {
       productsCart: (state) => state.cart.products,
       isAuthenticated: (state) => state.auth.isAuthenticated,
     }),
-    storeInitials() {
-      return (this.company.name || "?").trim().charAt(0).toUpperCase();
-    },
     filteredProducts() {
       const products = this.company.products.data || [];
       if (!this.search.trim()) return products;
@@ -376,33 +371,28 @@ export default {
 }
 
 .store-cover {
-  height: 96px;
+  position: relative;
+  height: 240px;
   background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  background-size: cover;
+  background-position: center;
 }
 
-.store-header-content {
-  display: flex;
-  align-items: flex-end;
-  gap: 1rem;
-  padding-top: 0;
-  transform: translateY(-32px);
-  margin-bottom: -20px;
+.store-cover.has-photo {
+  background-color: #eee;
 }
 
 .store-avatar {
-  width: 84px;
-  height: 84px;
-  min-width: 84px;
-  border-radius: 20px;
+  position: absolute;
+  left: 50%;
+  bottom: -30px;
+  transform: translateX(-50%);
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
   background: #fff;
   border: 4px solid #fff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #ff6b35;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   overflow: hidden;
 }
 
@@ -412,51 +402,54 @@ export default {
   object-fit: cover;
 }
 
-.store-info {
-  padding-bottom: 0.5rem;
+.store-header-content {
+  padding: 2.75rem 1rem 1rem;
+  text-align: center;
 }
 
 .store-name {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: #1a1a1a;
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.5rem;
 }
 
 .store-meta {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 1rem;
-  font-size: 0.85rem;
+  gap: 0.6rem 1rem;
+  font-size: 0.88rem;
   color: #6b7280;
+}
+
+.store-location {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.store-location i {
+  color: #9ca3af;
 }
 
 .store-status {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  color: #1a9b52;
-  font-weight: 600;
+  color: #15803d;
+  font-weight: 700;
+  background: #dcfce7;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #1a9b52;
-}
-
-.store-contact {
-  color: #6b7280;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.store-contact:hover {
-  color: #ff6b35;
+  background: #15803d;
 }
 
 /* ── Toolbar (search + categories) ───────────────────────── */
@@ -823,11 +816,13 @@ export default {
 }
 
 @media (max-width: 480px) {
+  .store-cover {
+    height: 190px;
+  }
+
   .store-avatar {
-    width: 68px;
-    height: 68px;
-    min-width: 68px;
-    font-size: 1.6rem;
+    width: 60px;
+    height: 60px;
   }
 
   .store-name {
