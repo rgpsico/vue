@@ -183,9 +183,10 @@
   </div>
 </template>
 
-<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 <script>
 import { mapActions, mapState } from "vuex";
+import io from "socket.io-client";
+import { SOCKET_URL } from "@/configs/api";
 
 export default {
   props: ["identify"],
@@ -241,22 +242,27 @@ export default {
     this.connectSocket();
   },
 
+  beforeDestroy() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  },
+
   methods: {
     ...mapActions(["getOrderByIdentify", "evaluationOrder"]),
 
     connectSocket() {
-      // Verificar se o `window.io` está disponível e usá-lo.
+      this.socket = io(SOCKET_URL, {
+        path: "/socket.io",
+        transports: ["websocket", "polling"],
+      });
 
-      // Utilize `window.io` para garantir que estamos usando o `io` do escopo global.
-      this.$socket.on("connect", () => {
+      this.socket.on("connect", () => {
         console.log("Conectado ao servidor Socket.IO.");
       });
 
-      // Receber mensagens do servidor
-
-      console.log(this.order.identify);
       // Receber mensagens específicas do entregador
-      this.$socket.on("enviarpedidoentregadores", (data) => {
+      this.socket.on("enviarpedidoentregadores", (data) => {
         console.log("Mensagem Recebida:", data);
         this.chatMessages.push({
           sender: "delivery",
@@ -264,7 +270,7 @@ export default {
         });
       });
 
-      this.$socket.on("disconnect", () => {
+      this.socket.on("disconnect", () => {
         console.log("Desconectado do servidor Socket.IO.");
       });
     },
@@ -297,12 +303,6 @@ export default {
         orderId: this.identify,
       };
 
-      // Emitir a mensagem para o servidor Socket.IO.
-      this.$socket.on("connect", () => {
-        console.log("Conectado ao servidor Socket.IO.");
-      });
-
-      //  this.$socket.emit("receberMensagemEntregador4", message);
       this.enviarMensagem();
       // Adicionar mensagem localmente para exibir no chat.
       this.chatMessages.push(message);
