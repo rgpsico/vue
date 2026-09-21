@@ -3,7 +3,7 @@
     <nav class="navbar navbar-dark fixed-top bg-ppgfood shadow-lg">
       <div class="container">
         <!-- Logo/Brand -->
-        <router-link :to="{name:'home'}" class="navbar-brand d-flex align-items-center">
+        <router-link :to="logoLink" class="navbar-brand d-flex align-items-center">
           <img
             src="@/assets/imgs/logo-cardapioproia.webp"
             alt="Cardápio PróIA"
@@ -109,8 +109,23 @@ export default {
   computed: {
     ...mapState({
       productsCart: state => state.cart.products,
-      me: state => state.auth.me
-    })
+      me: state => state.auth.me,
+      companyFlag: state => state.companies.companySelected.flag
+    }),
+
+    // Enquanto o usuário está navegando dentro de uma barraca (cardápio,
+    // carrinho ou pedido), o logo deve levar de volta pra ela, não pra
+    // lista geral de lojas - cada barraca tem seu próprio cardápio.
+    insideStoreRoutes() {
+      return ['products', 'cart', 'order.detail'].includes(this.$route.name)
+    },
+
+    logoLink() {
+      if (this.insideStoreRoutes && this.companyFlag) {
+        return { name: 'products', params: { companyFlag: this.companyFlag } }
+      }
+      return { name: 'home' }
+    }
   },
 
   methods: {

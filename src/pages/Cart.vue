@@ -7,7 +7,7 @@
             <i class="fa fa-shopping-cart mr-2" aria-hidden="true"></i>
             Carrinho de Compras
            
-            <router-link class="btn bnt-sm btn-comprando" :to="{name:'home'}">Continuar Comprando</router-link>
+            <router-link class="btn bnt-sm btn-comprando" :to="continueShoppingLink">Continuar Comprando</router-link>
             <div class="clearfix"></div>
         </div>
         <div class="card-body">
@@ -68,10 +68,17 @@ import Checkout from './_partials/Checkout.vue'
 export default {
     computed: {
         ...mapState({
-          products: state => state.cart.products
+          products: state => state.cart.products,
+          companyFlag: state => state.companies.companySelected.flag
       }),
 
-    
+    // Continuar comprando deve voltar pra loja atual (cada barraca tem
+    // seu proprio cardapio), nao pra listagem geral de lojas.
+    continueShoppingLink() {
+      return this.companyFlag
+        ? { name: 'products', params: { companyFlag: this.companyFlag } }
+        : { name: 'home' }
+    },
   },
 
   methods: {
