@@ -18,6 +18,12 @@
               order.status
             }}</span>
           </li>
+          <li class="mt-2" v-if="order.table && order.table.name">
+            <div class="alert alert-info p-2 mb-0 d-inline-flex align-items-center">
+              <i class="fas fa-umbrella-beach me-2"></i>
+              <span><b>Local:</b> {{ order.table.name }}</span>
+            </div>
+          </li>
         </ul>
       </div>
       <div class="col-sm-6">
@@ -214,6 +220,7 @@ export default {
           name: "",
           image: "",
         },
+        table: null,
         products: [],
         evaluations: [],
       },
