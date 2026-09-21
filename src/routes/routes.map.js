@@ -41,7 +41,17 @@ const routes = [
                 name: 'products',
                 props: true
             },
-        
+
+            // Deep link do QR Code de cada guarda-sol/cadeira (gerado no
+            // admin): escanear leva direto pro cardapio da loja com o
+            // guarda-sol ja selecionado, sem precisar escolher na lista.
+            {
+                path: '/:tenantUuid([0-9a-fA-F-]{36})/:tableUuid([0-9a-fA-F-]{36})',
+                component: Products,
+                name: 'products.table',
+                props: true
+            },
+
             {
                 path: '/',
                 component: Home,

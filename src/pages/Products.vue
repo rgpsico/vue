@@ -212,7 +212,7 @@ import { API_VERSION } from "@/configs/api";
 import calcadaoPattern from "@/assets/imgs/calcadao-pattern.webp";
 
 export default {
-  props: ["companyFlag"],
+  props: ["companyFlag", "tenantUuid", "tableUuid"],
   data() {
     return {
       filters: {
@@ -300,11 +300,45 @@ export default {
     },
 
     async initializeComponent() {
+      // Deep link do QR Code de um guarda-sol/cadeira especifico
+      if (this.tenantUuid && this.tableUuid) {
+        await this.loadFromTableDeepLink();
+        return;
+      }
+
       const slug = window.location.pathname.split("/").filter(Boolean).pop();
       if (this.company.name === "") {
         await this.buscarEmpresaPorSlug(slug);
       } else {
         await this.loadInitialData();
+      }
+    },
+
+    async loadFromTableDeepLink() {
+      try {
+        this.loading = true;
+        const tenantResponse = await axios.get(
+          `${API_VERSION}/tenants/${this.tenantUuid}`
+        );
+        this.setCompany(tenantResponse.data.data);
+
+        try {
+          const tableResponse = await axios.get(
+            `${API_VERSION}/tables/${this.tableUuid}`,
+            { params: { token_company: this.tenantUuid } }
+          );
+          this.setSelectedTable(tableResponse.data.data);
+        } catch (tableError) {
+          // Guarda-sol invalido/removido - segue sem selecionar, cliente
+          // pode escolher manualmente na tela
+        }
+
+        await this.loadInitialData();
+      } catch (error) {
+        this.$vToastify.error("Loja não encontrada", "Erro");
+        this.$router.push({ name: "home" });
+      } finally {
+        this.loading = false;
       }
     },
 
