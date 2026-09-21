@@ -28,6 +28,33 @@
             Aberto
           </span>
         </div>
+
+        <div class="table-picker">
+          <button
+            class="table-picker-badge"
+            @click="showTablePicker = !showTablePicker"
+          >
+            <i class="fa-solid fa-umbrella-beach"></i>
+            <span v-if="selectedTable">{{ selectedTable.name }}</span>
+            <span v-else>Selecionar guarda-sol / cadeira</span>
+            <i class="fa-solid fa-chevron-down table-picker-caret"></i>
+          </button>
+
+          <div class="table-picker-dropdown" v-if="showTablePicker">
+            <p v-if="tables.length === 0" class="table-picker-empty">
+              Nenhum guarda-sol cadastrado nesta loja.
+            </p>
+            <button
+              v-for="table in tables"
+              :key="table.identify"
+              class="table-picker-option"
+              :class="{ active: selectedTable && selectedTable.identify === table.identify }"
+              @click="chooseTable(table)"
+            >
+              {{ table.name }}
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -196,6 +223,8 @@ export default {
       placeholderImage:
         "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' fill='%23f1f2f4'/%3E%3C/svg%3E",
       calcadaoPattern,
+      tables: [],
+      showTablePicker: false,
     };
   },
   computed: {
@@ -204,6 +233,7 @@ export default {
       categories: (state) => state.companies.categoriesCompanySelected,
       productsCart: (state) => state.cart.products,
       isAuthenticated: (state) => state.auth.isAuthenticated,
+      selectedTable: (state) => state.companies.selectedTable,
     }),
     filteredProducts() {
       const products = this.company.products.data || [];
@@ -231,14 +261,33 @@ export default {
     this.initializeComponent();
   },
   methods: {
-    ...mapActions(["getCategoriesByCompany", "getProductsByCompany"]),
+    ...mapActions([
+      "getCategoriesByCompany",
+      "getProductsByCompany",
+      "getTablesByCompany",
+    ]),
     ...mapMutations({
       addProdCart: "ADD_PRODUCT_CART",
       removeProdCart: "REMOVE_PRODUCT_CART",
       incrementProdCart: "INCREMENT_QTY_PROD_CART",
       decrementProdCart: "DECREMENT_QTY_PROD_CART",
       setCompany: "SET_COMPANY_SELECTED",
+      setSelectedTable: "SET_SELECTED_TABLE",
     }),
+
+    async loadTables() {
+      if (!this.company.uuid) return;
+      try {
+        this.tables = await this.getTablesByCompany(this.company.uuid);
+      } catch (error) {
+        this.tables = [];
+      }
+    },
+
+    chooseTable(table) {
+      this.setSelectedTable(table);
+      this.showTablePicker = false;
+    },
 
     handleCartClick() {
       const token = localStorage.getItem("token_sanctum");
@@ -263,6 +312,7 @@ export default {
       try {
         await this.getCategoriesByCompany(this.company.uuid);
         await this.loadProducts();
+        await this.loadTables();
       } catch (error) {
         this.$vToastify.error("Falha ao carregar dados", "Erro");
       }
@@ -415,7 +465,6 @@ export default {
   position: relative;
   padding: 2.75rem 1rem 1rem;
   text-align: center;
-  overflow: hidden;
 }
 
 .calcadao-pattern {
@@ -476,6 +525,85 @@ export default {
   height: 7px;
   border-radius: 50%;
   background: #15803d;
+}
+
+/* ── Table picker (guarda-sol / cadeira) ─────────────────── */
+.table-picker {
+  position: relative;
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+}
+
+.table-picker-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff7ed;
+  border: 1.5px solid #ff6b35;
+  color: #c2410c;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.table-picker-badge:hover {
+  background: #ffedd5;
+}
+
+.table-picker-caret {
+  font-size: 0.65rem;
+  color: #c2410c;
+  opacity: 0.7;
+}
+
+.table-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  min-width: 220px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 60;
+}
+
+.table-picker-empty {
+  padding: 0.75rem;
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.table-picker-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.table-picker-option:hover {
+  background: #f2f3f5;
+}
+
+.table-picker-option.active {
+  background: #fff7ed;
+  color: #c2410c;
+  font-weight: 700;
 }
 
 /* ── Toolbar (search + categories) ───────────────────────── */

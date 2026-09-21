@@ -15,9 +15,10 @@ const state = {
     categoriesCompanySelected: {
         data:[]
 
-    }
+    },
 
-  
+    // Guarda-sol/cadeira selecionado pelo cliente na loja atual
+    selectedTable: null
 
 }
 

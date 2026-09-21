@@ -27,7 +27,7 @@
                 ><strong>Onde você está?</strong></label
               >
               <select
-                v-model="selectedTable"
+                v-model="selectedTableIdentify"
                 id="tableSelect"
                 class="form-control"
               >
@@ -172,7 +172,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
   computed: {
@@ -188,6 +188,19 @@ export default {
         0
       );
     },
+
+    // Compartilhado com a tela da loja - selecionar aqui ou la reflete
+    // no mesmo lugar (Vuex + localStorage).
+    selectedTableIdentify: {
+      get() {
+        const table = this.$store.state.companies.selectedTable;
+        return table ? table.identify : "";
+      },
+      set(identify) {
+        const table = this.tables.find((t) => t.identify === identify) || null;
+        this.setSelectedTable(table);
+      },
+    },
   },
 
   data() {
@@ -202,7 +215,6 @@ export default {
       expiryYear: "",
       cvv: "",
       tables: [],
-      selectedTable: "",
     };
   },
 
@@ -212,6 +224,9 @@ export default {
       "createPaymentWithCreditCard",
       "getTablesByCompany",
     ]),
+    ...mapMutations({
+      setSelectedTable: "SET_SELECTED_TABLE",
+    }),
 
     async loadTables() {
       if (!this.company.uuid) return;
@@ -234,7 +249,7 @@ export default {
         payment_method: this.paymentMethod,
         value: this.totalCart,
         products: [...this.products],
-        table: this.selectedTable || undefined,
+        table: this.selectedTableIdentify || undefined,
       };
 
       if (this.paymentMethod === "pix") {
