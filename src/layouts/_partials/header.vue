@@ -4,9 +4,9 @@
       <div class="container">
         <!-- Logo/Brand -->
         <router-link :to="{name:'home'}" class="navbar-brand d-flex align-items-center">
-          <img 
-            src="@/assets/imgs/logo-vuefood.png" 
-            alt="PPGFOOD" 
+          <img
+            src="@/assets/imgs/logo-cardapioproia.webp"
+            alt="Cardápio PróIA"
             class="logo me-2"
             loading="lazy"
           >
