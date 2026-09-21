@@ -180,6 +180,8 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
+import axios from "axios";
+import { API_VERSION } from "@/configs/api";
 import calcadaoPattern from "@/assets/imgs/calcadao-pattern.webp";
 
 export default {
@@ -235,6 +237,7 @@ export default {
       removeProdCart: "REMOVE_PRODUCT_CART",
       incrementProdCart: "INCREMENT_QTY_PROD_CART",
       decrementProdCart: "DECREMENT_QTY_PROD_CART",
+      setCompany: "SET_COMPANY_SELECTED",
     }),
 
     handleCartClick() {
@@ -273,7 +276,10 @@ export default {
         );
         const data = await response.json();
         if (response.ok) {
-          this.company.uuid = data.uuid;
+          const tenantResponse = await axios.get(
+            `${API_VERSION}/tenants/${data.uuid}`
+          );
+          this.setCompany(tenantResponse.data.data);
           await this.loadInitialData();
         } else {
           this.$vToastify.error(
