@@ -51,4 +51,9 @@ export default {
                         .finally(() => commit('SET_PRELOADER', false))
     },
 
+    getTablesByCompany ({commit}, token_company) {
+        return axios.get(`${API_VERSION}/tables`, { params: { token_company } })
+                        .then(response => response.data.data)
+    },
+
 }

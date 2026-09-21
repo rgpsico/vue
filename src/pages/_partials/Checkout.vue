@@ -22,6 +22,26 @@
             <p>
               <strong>Preço total: R$ {{ totalCart }}</strong>
             </p>
+            <div class="form-group" v-if="tables.length > 0">
+              <label for="tableSelect"
+                ><strong>Onde você está?</strong></label
+              >
+              <select
+                v-model="selectedTable"
+                id="tableSelect"
+                class="form-control"
+              >
+                <option value="">Selecione o guarda-sol / cadeira</option>
+                <option
+                  v-for="table in tables"
+                  :key="table.identify"
+                  :value="table.identify"
+                >
+                  {{ table.name }}
+                </option>
+              </select>
+            </div>
+
             <div class="form-group">
               <textarea
                 name="comment"
@@ -181,11 +201,26 @@ export default {
       expiryMonth: "",
       expiryYear: "",
       cvv: "",
+      tables: [],
+      selectedTable: "",
     };
   },
 
   methods: {
-    ...mapActions(["createOrder", "createPaymentWithCreditCard"]),
+    ...mapActions([
+      "createOrder",
+      "createPaymentWithCreditCard",
+      "getTablesByCompany",
+    ]),
+
+    async loadTables() {
+      if (!this.company.uuid) return;
+      try {
+        this.tables = await this.getTablesByCompany(this.company.uuid);
+      } catch (error) {
+        this.tables = [];
+      }
+    },
 
     createOrder() {
       this.loading = true;
@@ -199,6 +234,7 @@ export default {
         payment_method: this.paymentMethod,
         value: this.totalCart,
         products: [...this.products],
+        table: this.selectedTable || undefined,
       };
 
       if (this.paymentMethod === "pix") {
@@ -309,6 +345,7 @@ export default {
     },
 
     openModalCheckout() {
+      this.loadTables();
       this.$bvModal.show("bv-modal-example");
     },
   },
