@@ -1,96 +1,299 @@
 <template>
-    <div class="container container-body">
+  <div class="cart-page">
+    <div class="cart-header">
+      <h1>Seu carrinho</h1>
+      <router-link class="btn-continue" :to="continueShoppingLink">
+        <i class="fa-solid fa-arrow-left"></i> Continuar comprando
+      </router-link>
+    </div>
 
-    <!-- cart -->
-    <div class="card shopping-cart my-4 ">
-        <div class="card-header text-light">
-            <i class="fa fa-shopping-cart mr-2" aria-hidden="true"></i>
-            Carrinho de Compras
-           
-            <router-link class="btn bnt-sm btn-comprando" :to="continueShoppingLink">Continuar Comprando</router-link>
-            <div class="clearfix"></div>
-        </div>
-        <div class="card-body">
-          <!-- PRODUCT -->
-          <div class="row align-items-center py-2" v-for="(item , index) in products" :key="index">
-            <div class="col-4 text-center">
-              <div class="img-circle">
-                <img class="img-responsive" :src="item.product.image" :alt="item.product.title" width="120" height="80">
+    <div v-if="products.length === 0" class="cart-empty">
+      <i class="fa-solid fa-cart-shopping cart-empty-icon"></i>
+      <p>Seu carrinho está vazio.</p>
+      <router-link class="btn-primary-pill" :to="continueShoppingLink">
+        Ver cardápio
+      </router-link>
+    </div>
+
+    <div v-else class="cart-layout">
+      <div class="cart-items">
+        <div class="cart-item" v-for="(item, index) in products" :key="index">
+          <div class="cart-item-image">
+            <img :src="item.product.image" :alt="item.product.title" />
+          </div>
+
+          <div class="cart-item-info">
+            <h3>{{ item.product.title }}</h3>
+            <p class="cart-item-desc">{{ item.product.description }}</p>
+
+            <div class="cart-item-footer">
+              <span class="cart-item-price">R$ {{ item.product.price }}</span>
+
+              <div class="qty-stepper">
+                <button class="qty-btn" @click="decrementQty(item.product)">
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <span class="qty-value">{{ item.qty }}</span>
+                <button class="qty-btn" @click="incrementQty(item.product)">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
               </div>
             </div>
-            <div class="col-8 text-left">
-              <h4 class="product-name"><strong>{{item.product.title}}</strong></h4>
-              <h5 class="h6">{{item.product.description}}</h5>
-              <div class="d-flex py-4 justify-content-between align-items-center">
-                <div class="col-10 d-flex align-items-center p-0 ">
-                    <h6><strong>R$ {{item.product.price}} 
-                      <span class="text-muted">x</span>
-                      </strong>
-                    </h6>
-
-                     <div class="quantity ml-4">
-                         <input type="button" value="+" class="plus" @click.prevent="incrementQty(item.product)">
-                                <input type="number" step="1" max="99" min="1" :value="item.qty" title="Qty" class="qty">
-                                <input type="button" value="-" class="minus" @click.prevent="decrementQty(item.product)">
-                    </div>
-                </div>
-                <div class="col-2 col-sm-2 col-md-2 text-right">
-                            <button type="button" 
-                            class="btn btn-outline-danger btn-xs"
-                            @click.prevent="removeCart(item.product)">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
-                </div>
-              </div>
-             </div>
           </div>
-        </div> 
-     
-          <!-- END PRODUCT -->
-          <hr>
-         
-         <checkout/>
-        </div>
-        <!-- end card body -->
-        
-    </div>
-    <!-- cart-->
 
- 
+          <button
+            class="cart-item-remove"
+            @click.prevent="removeCart(item.product)"
+            aria-label="Remover item"
+          >
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="cart-summary">
+        <checkout />
+      </div>
+    </div>
+  </div>
 </template>
-<style scoped>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css');
-</style>
+
 <script>
-import {mapState , mapMutations} from 'vuex'
-import Checkout from './_partials/Checkout.vue'
+import { mapState, mapMutations } from "vuex";
+import Checkout from "./_partials/Checkout.vue";
 
 export default {
-    computed: {
-        ...mapState({
-          products: state => state.cart.products,
-          companyFlag: state => state.companies.companySelected.flag
-      }),
+  computed: {
+    ...mapState({
+      products: (state) => state.cart.products,
+      companyFlag: (state) => state.companies.companySelected.flag,
+    }),
 
     // Continuar comprando deve voltar pra loja atual (cada barraca tem
     // seu proprio cardapio), nao pra listagem geral de lojas.
     continueShoppingLink() {
       return this.companyFlag
-        ? { name: 'products', params: { companyFlag: this.companyFlag } }
-        : { name: 'home' }
+        ? { name: "products", params: { companyFlag: this.companyFlag } }
+        : { name: "home" };
     },
   },
 
   methods: {
     ...mapMutations({
-       removeCart: 'REMOVE_PROD_CART',
-      incrementQty: 'INCREMENT_QTY_PROD_CART',
-      decrementQty: 'DECREMENT_QTY_PROD_CART',
+      removeCart: "REMOVE_PROD_CART",
+      incrementQty: "INCREMENT_QTY_PROD_CART",
+      decrementQty: "DECREMENT_QTY_PROD_CART",
     }),
   },
 
   components: {
-    Checkout
+    Checkout,
+  },
+};
+</script>
+
+<style scoped>
+.cart-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.cart-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.btn-continue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff6b35;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.btn-continue:hover {
+  color: #f7931e;
+}
+
+.cart-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: #6c757d;
+}
+
+.cart-empty-icon {
+  font-size: 48px;
+  color: #ffcbb0;
+  margin-bottom: 16px;
+}
+
+.cart-empty p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.btn-primary-pill {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+}
+
+.cart-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.cart-items {
+  flex: 1 1 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  padding: 14px;
+}
+
+.cart-item-image {
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f4f4f4;
+}
+
+.cart-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-info h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 2px;
+}
+
+.cart-item-desc {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin: 0 0 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.cart-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cart-item-price {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #fff;
+  border: 1.5px solid #ff6b35;
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+}
+
+.qty-btn {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: #ff6b35;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  cursor: pointer;
+}
+
+.qty-value {
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 14px;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.cart-item-remove {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: #dc3545;
+  opacity: 0.6;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.cart-item-remove:hover {
+  opacity: 1;
+}
+
+.cart-summary {
+  flex: 1 1 36%;
+  min-width: 280px;
+  position: sticky;
+  top: 72px;
+}
+
+@media (max-width: 768px) {
+  .cart-layout {
+    flex-direction: column;
+  }
+
+  .cart-summary {
+    position: static;
+    width: 100%;
   }
 }
-</script>
+</style>
