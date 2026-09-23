@@ -5,6 +5,12 @@ export default {
     },
 
     SET_COMPANY_SELECTED (state, company) {
+           // Trocar de loja nao deve manter o desbloqueio de admin da loja anterior
+           const isDifferentCompany = state.companySelected.uuid && state.companySelected.uuid !== company.uuid
+           if (isDifferentCompany) {
+             state.adminUnlocked = false
+           }
+
            state.companySelected = Object.assign(state.companySelected, company)
 
            // Recupera o guarda-sol/cadeira salvo, mas so se for da mesma loja -
@@ -64,6 +70,10 @@ export default {
     SET_PRODUCTS_COMPANY (state, products) {
         state.companySelected.products = products
 
+    },
+
+    SET_ADMIN_UNLOCKED (state, value) {
+        state.adminUnlocked = value
     }
 
 }

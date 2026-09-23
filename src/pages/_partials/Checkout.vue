@@ -240,7 +240,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
@@ -250,6 +249,7 @@ export default {
       me: (state) => state.auth.me,
       company: (state) => state.companies.companySelected,
       selectedTableFromQr: (state) => state.companies.selectedTableFromQr,
+      adminUnlocked: (state) => state.companies.adminUnlocked,
     }),
 
     totalCart() {
@@ -300,9 +300,9 @@ export default {
       expiryYear: "",
       cvv: "",
       tables: [],
-      // Desbloqueio pra equipe da barraca escolher o guarda-sol livremente
-      // sem precisar escanear o QR Code (ex: pedido feito no balcao)
-      adminUnlocked: false,
+      // Desbloqueio (adminUnlocked em si vem do Vuex, compartilhado com o
+      // seletor de guarda-sol da loja) pra equipe da barraca escolher o
+      // guarda-sol livremente sem precisar escanear o QR Code
       showAdminUnlock: false,
       adminPassword: "",
       unlockingAdmin: false,
@@ -315,6 +315,7 @@ export default {
       "createOrder",
       "createPaymentWithCreditCard",
       "getTablesByCompany",
+      "unlockAdmin",
     ]),
     ...mapMutations({
       setSelectedTable: "SET_SELECTED_TABLE",
@@ -329,35 +330,20 @@ export default {
       }
     },
 
-    // Confirma a senha do admin da barraca (mesmo login do painel) sem
-    // manter sessao - so usada como prova de que quem esta escolhendo o
-    // guarda-sol e de confianca (equipe), nao um cliente qualquer.
+    // Confirma a senha do admin da barraca (mesmo login do painel) - uma
+    // vez desbloqueado, vale tambem pro seletor de guarda-sol no topo da
+    // loja (estado compartilhado no Vuex), nao so aqui no checkout.
     unlockAsAdmin() {
       this.adminUnlockError = "";
       if (!this.adminPassword) return;
 
       this.unlockingAdmin = true;
 
-      axios
-        .post("staff/login", {
-          email: this.company.contact,
-          password: this.adminPassword,
-          device_name: "checkout-verify",
-        })
-        .then((response) => {
-          this.adminUnlocked = true;
+      this.unlockAdmin({ email: this.company.contact, password: this.adminPassword })
+        .then(() => {
           this.showAdminUnlock = false;
           this.adminPassword = "";
           this.$vToastify.success("Liberado! Escolha o guarda-sol.", "Pronto");
-
-          const token = response.data.token;
-          axios
-            .post(
-              "staff/logout",
-              {},
-              { headers: { Authorization: `Bearer ${token}` } }
-            )
-            .catch(() => {});
         })
         .catch(() => {
           this.adminUnlockError = "Senha incorreta";

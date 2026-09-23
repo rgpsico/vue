@@ -56,4 +56,22 @@ export default {
                         .then(response => response.data.data)
     },
 
+    // Confirma a senha do admin da barraca (mesmo login do painel) pra
+    // liberar a escolha manual do guarda-sol pra quem nao esta logado -
+    // sem manter sessao, so serve como prova de identidade pontual.
+    unlockAdmin ({ commit }, { email, password }) {
+        return axios.post('staff/login', {
+            email,
+            password,
+            device_name: 'checkout-verify',
+        }).then((response) => {
+            commit('SET_ADMIN_UNLOCKED', true)
+
+            const token = response.data.token
+            axios.post('staff/logout', {}, {
+                headers: { Authorization: `Bearer ${token}` },
+            }).catch(() => {})
+        })
+    },
+
 }

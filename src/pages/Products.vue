@@ -32,15 +32,19 @@
         <div class="table-picker">
           <button
             class="table-picker-badge"
-            @click="showTablePicker = !showTablePicker"
+            :class="{ locked: !canPickTableFreely && selectedTable }"
+            @click="toggleTablePicker"
           >
-            <i class="fa-solid fa-umbrella-beach"></i>
+            <i
+              class="fa-solid"
+              :class="!canPickTableFreely && selectedTable ? 'fa-lock' : 'fa-umbrella-beach'"
+            ></i>
             <span v-if="selectedTable">{{ selectedTable.name }}</span>
             <span v-else>Selecionar guarda-sol / cadeira</span>
             <i class="fa-solid fa-chevron-down table-picker-caret"></i>
           </button>
 
-          <div class="table-picker-dropdown" v-if="showTablePicker">
+          <div class="table-picker-dropdown" v-if="showTablePicker && canPickTableFreely">
             <p v-if="tables.length === 0" class="table-picker-empty">
               Nenhum guarda-sol cadastrado nesta loja.
             </p>
@@ -52,6 +56,31 @@
               @click="chooseTable(table)"
             >
               {{ table.name }}
+            </button>
+          </div>
+
+          <div class="table-picker-dropdown admin-unlock-dropdown" v-if="showAdminUnlock">
+            <p class="admin-unlock-hint">
+              {{
+                selectedTableFromQr
+                  ? "Guarda-sol travado pelo QR Code. Digite a senha do admin pra trocar."
+                  : "Digite a senha do admin da barraca pra escolher o guarda-sol."
+              }}
+            </p>
+            <input
+              type="password"
+              v-model="adminPassword"
+              class="admin-unlock-input"
+              placeholder="Senha do administrador"
+              @keyup.enter="submitAdminUnlock"
+            />
+            <p class="admin-unlock-error" v-if="adminUnlockError">{{ adminUnlockError }}</p>
+            <button
+              class="admin-unlock-submit"
+              :disabled="unlockingAdmin || !adminPassword"
+              @click="submitAdminUnlock"
+            >
+              {{ unlockingAdmin ? "Verificando..." : "Desbloquear" }}
             </button>
           </div>
         </div>
@@ -225,6 +254,10 @@ export default {
       calcadaoPattern,
       tables: [],
       showTablePicker: false,
+      showAdminUnlock: false,
+      adminPassword: "",
+      unlockingAdmin: false,
+      adminUnlockError: "",
     };
   },
   computed: {
@@ -234,7 +267,15 @@ export default {
       productsCart: (state) => state.cart.products,
       isAuthenticated: (state) => state.auth.authenticated,
       selectedTable: (state) => state.companies.selectedTable,
+      selectedTableFromQr: (state) => state.companies.selectedTableFromQr,
+      adminUnlocked: (state) => state.companies.adminUnlocked,
     }),
+
+    // Sem login e sem senha do admin, so pode ver o guarda-sol que veio
+    // do QR Code (se veio) - nao pode abrir a lista e trocar livremente
+    canPickTableFreely() {
+      return this.isAuthenticated || this.adminUnlocked;
+    },
     filteredProducts() {
       const products = this.company.products.data || [];
       if (!this.search.trim()) return products;
@@ -265,6 +306,7 @@ export default {
       "getCategoriesByCompany",
       "getProductsByCompany",
       "getTablesByCompany",
+      "unlockAdmin",
     ]),
     ...mapMutations({
       addProdCart: "ADD_PRODUCT_CART",
@@ -288,6 +330,39 @@ export default {
     chooseTable(table) {
       this.setSelectedTable(table);
       this.showTablePicker = false;
+    },
+
+    // Sem login (e sem senha do admin), abrir o badge nao mostra a lista
+    // livre - pede a senha do admin em vez disso. Impede qualquer um de
+    // trocar o guarda-sol so clicando, mesmo fora do checkout.
+    toggleTablePicker() {
+      if (this.canPickTableFreely) {
+        this.showTablePicker = !this.showTablePicker;
+        return;
+      }
+      this.adminUnlockError = "";
+      this.showAdminUnlock = !this.showAdminUnlock;
+    },
+
+    submitAdminUnlock() {
+      this.adminUnlockError = "";
+      if (!this.adminPassword) return;
+
+      this.unlockingAdmin = true;
+
+      this.unlockAdmin({ email: this.company.contact, password: this.adminPassword })
+        .then(() => {
+          this.showAdminUnlock = false;
+          this.adminPassword = "";
+          this.showTablePicker = true;
+          this.$vToastify.success("Liberado! Escolha o guarda-sol.", "Pronto");
+        })
+        .catch(() => {
+          this.adminUnlockError = "Senha incorreta";
+        })
+        .finally(() => {
+          this.unlockingAdmin = false;
+        });
     },
 
     handleCartClick() {
@@ -641,6 +716,61 @@ export default {
   background: #fff7ed;
   color: #c2410c;
   font-weight: 700;
+}
+
+.table-picker-badge.locked {
+  background: #f2f3f5;
+  border-color: #d1d5db;
+  color: #4b5563;
+}
+
+.admin-unlock-dropdown {
+  padding: 0.9rem;
+  text-align: left;
+}
+
+.admin-unlock-hint {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.admin-unlock-input {
+  width: 100%;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-unlock-input:focus {
+  outline: none;
+  border-color: #ff6b35;
+}
+
+.admin-unlock-error {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.admin-unlock-submit {
+  width: 100%;
+  border: none;
+  background: #0a4d78;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.admin-unlock-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* ── Toolbar (search + categories) ───────────────────────── */
