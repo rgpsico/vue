@@ -3,6 +3,7 @@ import Products from '@/pages/Products'
 import Cart from '@/pages/Cart'
 import Login from '@/pages/Auth/Login'
 import Register from '@/pages/Auth/Register'
+import SignupTenant from '@/pages/Auth/SignupTenant'
 import MyOrders from '@/pages/Auth/MyOrders'
 import DetailOrder from '@/pages/DetailOrder'
 import PageNotFound from '@/pages/PageNotFound'
@@ -79,6 +80,11 @@ const routes = [
                 path: '/cadastrar',
                 component: Register,
                 name: 'register'
+            },
+            {
+                path: '/cadastrar-barraca',
+                component: SignupTenant,
+                name: 'signup.tenant'
             }
 
         ]
