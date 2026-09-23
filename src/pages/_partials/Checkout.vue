@@ -35,7 +35,7 @@
             <strong>R$ {{ totalCart }}</strong>
           </div>
 
-          <template v-if="me.name !== '' || guestCheckoutEnabled">
+          <template v-if="!isGuest">
             <div class="form-group" v-if="tables.length > 0">
               <label for="tableSelect">Onde você está?</label>
               <select v-model="selectedTableIdentify" id="tableSelect" class="form-control">
@@ -138,6 +138,60 @@
             </button>
           </template>
 
+          <!-- Pedido sem login: so libera se o guarda-sol veio do QR Code
+               escaneado (prova que a pessoa esta la), nunca de uma lista
+               escolhida livremente - qualquer um poderia marcar o
+               guarda-sol errado de proposito. -->
+          <template v-else-if="guestCheckoutEnabled && selectedTableFromQr">
+            <div class="form-group">
+              <label>Onde você está?</label>
+              <div class="checkout-locked-table">
+                <i class="fa-solid fa-umbrella-beach"></i>
+                {{ selectedTableName }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="comment">Comentário (opcional)</label>
+              <textarea
+                id="comment"
+                name="comment"
+                v-model="comment"
+                rows="2"
+                placeholder="Ex: sem cebola, capricha no gelo..."
+                class="form-control"
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="paymentMethod">Forma de pagamento</label>
+              <select v-model="paymentMethod" id="paymentMethod" class="form-control">
+                <option value="pagamento_entrega">Pagamento na Entrega</option>
+              </select>
+            </div>
+
+            <button class="btn-confirm" @click.prevent="createOrder">
+              Confirmar pedido
+            </button>
+          </template>
+
+          <template v-else-if="guestCheckoutEnabled">
+            <div class="checkout-qr-hint">
+              <i class="fa-solid fa-qrcode"></i>
+              <p>
+                Escaneie o QR Code do seu guarda-sol pra fazer o pedido sem
+                precisar criar conta.
+              </p>
+            </div>
+
+            <router-link :to="{ name: 'login' }" class="btn-confirm">
+              Fazer login
+            </router-link>
+            <router-link :to="{ name: 'register' }" class="btn-secondary-pill">
+              Criar conta
+            </router-link>
+          </template>
+
           <template v-else>
             <p class="checkout-login-hint">
               Entre na sua conta ou cadastre-se pra finalizar o pedido.
@@ -165,6 +219,7 @@ export default {
       products: (state) => state.cart.products,
       me: (state) => state.auth.me,
       company: (state) => state.companies.companySelected,
+      selectedTableFromQr: (state) => state.companies.selectedTableFromQr,
     }),
 
     totalCart() {
@@ -174,10 +229,19 @@ export default {
       );
     },
 
+    isGuest() {
+      return this.me.name === "";
+    },
+
     // Configuravel por loja (tela Configuracoes do admin) - lojas de
     // praia deixam o cliente pedir so escolhendo o guarda-sol, sem login.
     guestCheckoutEnabled() {
       return !!this.company.guest_checkout_enabled;
+    },
+
+    selectedTableName() {
+      const table = this.$store.state.companies.selectedTable;
+      return table ? table.name : "";
     },
 
     // Compartilhado com a tela da loja - selecionar aqui ou la reflete
@@ -229,12 +293,12 @@ export default {
     },
 
     createOrder() {
-      // Pedido sem login so identifica o cliente pelo guarda-sol/mesa -
-      // sem isso nao tem como saber pra onde entregar.
-      const isGuest = this.me.name === "";
-      if (isGuest && this.tables.length > 0 && !this.selectedTableIdentify) {
+      // Pedido sem login so e permitido com guarda-sol vindo do QR Code
+      // escaneado - prova presenca fisica. Escolha manual numa lista
+      // deixaria qualquer um marcar o guarda-sol errado de proposito.
+      if (this.isGuest && !this.selectedTableFromQr) {
         this.$vToastify.error(
-          "Selecione o guarda-sol / cadeira para continuar",
+          "Escaneie o QR Code do guarda-sol para continuar",
           "Erro"
         );
         return;
@@ -570,6 +634,40 @@ textarea.form-control {
   color: #6c757d;
   font-size: 0.9rem;
   margin-bottom: 16px;
+}
+
+.checkout-locked-table {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff6f2;
+  border: 1.5px solid #ffcbb0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.checkout-locked-table i {
+  color: #ff6b35;
+}
+
+.checkout-qr-hint {
+  text-align: center;
+  padding: 12px 0 20px;
+  color: #6c757d;
+}
+
+.checkout-qr-hint i {
+  font-size: 32px;
+  color: #ff6b35;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.checkout-qr-hint p {
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 .checkout-spinner {

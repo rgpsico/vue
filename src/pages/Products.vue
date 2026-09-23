@@ -273,6 +273,7 @@ export default {
       decrementProdCart: "DECREMENT_QTY_PROD_CART",
       setCompany: "SET_COMPANY_SELECTED",
       setSelectedTable: "SET_SELECTED_TABLE",
+      setSelectedTableFromQr: "SET_SELECTED_TABLE_FROM_QR",
     }),
 
     async loadTables() {
@@ -329,7 +330,7 @@ export default {
             `${API_VERSION}/tables/${this.tableUuid}`,
             { params: { token_company: this.tenantUuid } }
           );
-          this.setSelectedTable(tableResponse.data.data);
+          this.setSelectedTableFromQr(tableResponse.data.data);
         } catch (tableError) {
           // Guarda-sol invalido/removido - segue sem selecionar, cliente
           // pode escolher manualmente na tela

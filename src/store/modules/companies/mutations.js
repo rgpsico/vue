@@ -13,20 +13,43 @@ export default {
              const saved = JSON.parse(localStorage.getItem('selected_table') || 'null')
              if (saved && saved.companyUuid === company.uuid) {
                state.selectedTable = saved.table
+               state.selectedTableFromQr = !!saved.fromQr
              } else {
                state.selectedTable = null
+               state.selectedTableFromQr = false
              }
            } catch (e) {
              state.selectedTable = null
+             state.selectedTableFromQr = false
            }
     },
 
+    // Escolha manual (badge/dropdown) - nao prova presenca fisica, entao
+    // nao vale pra liberar pedido sem login (ver SET_SELECTED_TABLE_FROM_QR)
     SET_SELECTED_TABLE (state, table) {
         state.selectedTable = table
+        state.selectedTableFromQr = false
         try {
           localStorage.setItem('selected_table', JSON.stringify({
             companyUuid: state.companySelected.uuid,
             table,
+            fromQr: false,
+          }))
+        } catch (e) {
+          // localStorage indisponivel - segue sem persistir
+        }
+    },
+
+    // Guarda-sol veio do QR Code escaneado - unica fonte confiavel de
+    // presenca fisica pra liberar pedido sem login
+    SET_SELECTED_TABLE_FROM_QR (state, table) {
+        state.selectedTable = table
+        state.selectedTableFromQr = true
+        try {
+          localStorage.setItem('selected_table', JSON.stringify({
+            companyUuid: state.companySelected.uuid,
+            table,
+            fromQr: true,
           }))
         } catch (e) {
           // localStorage indisponivel - segue sem persistir
