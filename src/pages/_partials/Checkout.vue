@@ -35,7 +35,7 @@
             <strong>R$ {{ totalCart }}</strong>
           </div>
 
-          <template v-if="me.name !== ''">
+          <template v-if="me.name !== '' || guestCheckoutEnabled">
             <div class="form-group" v-if="tables.length > 0">
               <label for="tableSelect">Onde você está?</label>
               <select v-model="selectedTableIdentify" id="tableSelect" class="form-control">
@@ -174,6 +174,12 @@ export default {
       );
     },
 
+    // Configuravel por loja (tela Configuracoes do admin) - lojas de
+    // praia deixam o cliente pedir so escolhendo o guarda-sol, sem login.
+    guestCheckoutEnabled() {
+      return !!this.company.guest_checkout_enabled;
+    },
+
     // Compartilhado com a tela da loja - selecionar aqui ou la reflete
     // no mesmo lugar (Vuex + localStorage).
     selectedTableIdentify: {
@@ -223,6 +229,17 @@ export default {
     },
 
     createOrder() {
+      // Pedido sem login so identifica o cliente pelo guarda-sol/mesa -
+      // sem isso nao tem como saber pra onde entregar.
+      const isGuest = this.me.name === "";
+      if (isGuest && this.tables.length > 0 && !this.selectedTableIdentify) {
+        this.$vToastify.error(
+          "Selecione o guarda-sol / cadeira para continuar",
+          "Erro"
+        );
+        return;
+      }
+
       this.loading = true;
 
       const asaasKey = localStorage.getItem("asaas_key");
