@@ -19,23 +19,22 @@ body {
 }
 .brand_logo_container {
     position: absolute;
-    height: 150px;
-    width: 150px;
-    top: -75px;
-    border-radius: 50%;
-    background: #fbfbfb;
-    padding: 10px;
+    height: 70px;
+    width: 220px;
+    top: -35px;
+    border-radius: 16px;
+    background: #b3134f;
+    padding: 10px 16px;
     text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 .brand_logo {
     height: 100%;
     width: 100%;
-    border-radius: 50%;
     object-fit: contain;
-    /* border: 2px solid white; */
 }
 .form_container {
-    margin-top: 100px;
+    margin-top: 55px;
 }
 .form_container form {
     width: 75%;

@@ -7,9 +7,9 @@
           <div class="brand_logo_container">
             <router-link :to="{ name: 'home' }">
               <img
-                src="@/assets/imgs/vue-food.png"
+                src="@/assets/imgs/logo-cardapioproia.webp"
                 class="brand_logo"
-                alt="Logo"
+                alt="Cardápio PróIA"
               />
             </router-link>
           </div>

@@ -50,12 +50,13 @@
                   :src="company.image"
                   :alt="company.name"
                 />
-                <img
-                  v-else
-                  class="card-image"
-                  src="@/assets/imgs/vue-food.png"
-                  :alt="company.name"
-                />
+                <div v-else class="card-image card-image-placeholder">
+                  <img
+                    class="placeholder-logo"
+                    src="@/assets/imgs/logo-cardapioproia.webp"
+                    :alt="company.name"
+                  />
+                </div>
                 <div class="card-overlay">
                   <i class="fas fa-eye view-icon"></i>
                 </div>
@@ -256,6 +257,19 @@ export default {
   height: 100%;
   object-fit: cover;
   transition: all 0.3s ease;
+}
+
+.card-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #b3134f;
+}
+
+.placeholder-logo {
+  width: 65%;
+  height: auto;
+  object-fit: contain;
 }
 
 .restaurant-card:hover .card-image {
