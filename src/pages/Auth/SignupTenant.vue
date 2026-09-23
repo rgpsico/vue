@@ -11,14 +11,43 @@
         </router-link>
       </div>
 
-      <h1 class="signup-title">Crie sua barraca</h1>
-      <p class="signup-subtitle">
-        Cadastre em menos de 1 minuto e comece a receber pedidos hoje mesmo
-      </p>
+      <!-- Progresso (so aparece depois da tela de boas-vindas) -->
+      <div class="signup-progress" v-if="currentStep > 0">
+        <span
+          v-for="step in totalFormSteps"
+          :key="step"
+          class="progress-dot"
+          :class="{ active: step <= currentStep }"
+        ></span>
+      </div>
 
-      <form @submit.prevent="signup" class="signup-form">
+      <!-- Passo 0: Boas-vindas -->
+      <div v-if="currentStep === 0" class="signup-step signup-welcome">
+        <div class="welcome-icon">🏖️</div>
+        <h1 class="signup-title">Bem-vindo(a) ao PPGFood!</h1>
+        <p class="signup-subtitle">
+          Vamos criar o ambiente da sua barraca em poucos passos — leva menos
+          de 1 minuto e você já cai direto no painel de pedidos.
+        </p>
+        <button type="button" class="btn-create" @click="currentStep = 1">
+          Vamos começar
+        </button>
+        <p class="signup-footer">
+          Já tem conta?
+          <router-link :to="{ name: 'login' }">Entrar</router-link>
+        </p>
+      </div>
+
+      <!-- Passo 1: Nome da barraca -->
+      <form
+        v-else-if="currentStep === 1"
+        @submit.prevent="goToStep(2)"
+        class="signup-step signup-form"
+      >
+        <h2 class="step-title">Qual o nome da sua barraca?</h2>
+        <p class="step-subtitle">É assim que seus clientes vão te encontrar</p>
+
         <div class="form-group">
-          <label for="tenant_name">Nome da barraca</label>
           <input
             id="tenant_name"
             type="text"
@@ -26,11 +55,26 @@
             class="form-control"
             :class="{ 'is-invalid': errors.tenant_name }"
             placeholder="Ex: Barraca do Zé"
+            autofocus
           />
           <p class="field-error" v-if="errors.tenant_name">
             {{ errors.tenant_name[0] }}
           </p>
         </div>
+
+        <div class="step-actions">
+          <button type="submit" class="btn-create">Próximo</button>
+        </div>
+      </form>
+
+      <!-- Passo 2: Login -->
+      <form
+        v-else-if="currentStep === 2"
+        @submit.prevent="goToStep(3)"
+        class="signup-step signup-form"
+      >
+        <h2 class="step-title">Como você vai acessar o painel?</h2>
+        <p class="step-subtitle">Guarde bem esses dados — é seu login</p>
 
         <div class="form-group">
           <label for="email">E-mail</label>
@@ -41,6 +85,7 @@
             class="form-control"
             :class="{ 'is-invalid': errors.email }"
             placeholder="voce@email.com"
+            autofocus
           />
           <p class="field-error" v-if="errors.email">{{ errors.email[0] }}</p>
         </div>
@@ -58,8 +103,27 @@
           <p class="field-error" v-if="errors.password">{{ errors.password[0] }}</p>
         </div>
 
+        <div class="step-actions step-actions-split">
+          <button type="button" class="btn-back" @click="currentStep = 1">
+            Voltar
+          </button>
+          <button type="submit" class="btn-create">Próximo</button>
+        </div>
+      </form>
+
+      <!-- Passo 3: Guarda-sois -->
+      <form
+        v-else-if="currentStep === 3"
+        @submit.prevent="signup"
+        class="signup-step signup-form"
+      >
+        <h2 class="step-title">Quantos guarda-sóis tem sua barraca?</h2>
+        <p class="step-subtitle">
+          Cria um guarda-sol numerado pra cada um automaticamente — dá pra
+          ajustar depois no painel.
+        </p>
+
         <div class="form-group">
-          <label for="umbrella_count">Quantos guarda-sóis?</label>
           <input
             id="umbrella_count"
             type="number"
@@ -69,25 +133,22 @@
             class="form-control"
             :class="{ 'is-invalid': errors.umbrella_count }"
             :placeholder="`De 1 até ${maxUmbrellas}`"
+            autofocus
           />
           <p class="field-error" v-if="errors.umbrella_count">
             {{ errors.umbrella_count[0] }}
           </p>
-          <p class="field-hint">
-            Cria um guarda-sol numerado pra cada um automaticamente — dá pra
-            ajustar depois no painel.
-          </p>
         </div>
 
-        <button type="submit" class="btn-create" :disabled="loading">
-          {{ loading ? "Criando sua barraca..." : "Criar minha barraca" }}
-        </button>
+        <div class="step-actions step-actions-split">
+          <button type="button" class="btn-back" @click="currentStep = 2" :disabled="loading">
+            Voltar
+          </button>
+          <button type="submit" class="btn-create" :disabled="loading">
+            {{ loading ? "Criando sua barraca..." : "Criar minha barraca" }}
+          </button>
+        </div>
       </form>
-
-      <p class="signup-footer">
-        Já tem conta?
-        <router-link :to="{ name: 'login' }">Entrar</router-link>
-      </p>
     </div>
   </div>
 </template>
@@ -102,6 +163,8 @@ export default {
     return {
       loading: false,
       maxUmbrellas: 20,
+      currentStep: 0,
+      totalFormSteps: 3,
       formData: {
         tenant_name: "",
         email: "",
@@ -113,6 +176,32 @@ export default {
   },
 
   methods: {
+    goToStep(step) {
+      this.errors = {};
+
+      if (step === 2 && this.formData.tenant_name.trim().length < 3) {
+        this.errors = { tenant_name: ["Digite pelo menos 3 letras"] };
+        return;
+      }
+
+      if (step === 3) {
+        if (!this.isValidEmail(this.formData.email)) {
+          this.errors = { email: ["Digite um e-mail válido"] };
+          return;
+        }
+        if (this.formData.password.length < 6) {
+          this.errors = { password: ["A senha precisa ter pelo menos 6 caracteres"] };
+          return;
+        }
+      }
+
+      this.currentStep = step;
+    },
+
+    isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    },
+
     signup() {
       this.errors = {};
       this.loading = true;
@@ -188,6 +277,49 @@ export default {
   object-fit: contain;
 }
 
+.signup-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #eee;
+  transition: background 0.2s ease;
+}
+
+.progress-dot.active {
+  background: #ff6b35;
+}
+
+.signup-step {
+  animation: step-fade-in 0.25s ease;
+}
+
+@keyframes step-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.signup-welcome {
+  text-align: center;
+}
+
+.welcome-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
 .signup-title {
   text-align: center;
   font-size: 1.4rem;
@@ -201,6 +333,20 @@ export default {
   color: #6c757d;
   font-size: 0.85rem;
   margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+.step-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin: 0 0 4px;
+}
+
+.step-subtitle {
+  color: #6c757d;
+  font-size: 0.82rem;
+  margin: 0 0 20px;
 }
 
 .signup-form .form-group {
@@ -241,10 +387,21 @@ export default {
   margin: 6px 0 0;
 }
 
-.field-hint {
-  color: #6c757d;
-  font-size: 0.75rem;
-  margin: 6px 0 0;
+.step-actions {
+  margin-top: 8px;
+}
+
+.step-actions-split {
+  display: flex;
+  gap: 12px;
+}
+
+.step-actions-split .btn-back {
+  flex: 1;
+}
+
+.step-actions-split .btn-create {
+  flex: 2;
 }
 
 .btn-create {
@@ -257,7 +414,6 @@ export default {
   padding: 14px;
   border-radius: 999px;
   cursor: pointer;
-  margin-top: 6px;
   box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
 }
 
@@ -268,6 +424,22 @@ export default {
 
 .btn-create:hover:not(:disabled) {
   filter: brightness(1.05);
+}
+
+.btn-back {
+  border: 1.5px solid #e5e5e5;
+  background: #fff;
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.btn-back:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .signup-footer {
