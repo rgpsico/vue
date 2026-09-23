@@ -232,7 +232,7 @@ export default {
       company: (state) => state.companies.companySelected,
       categories: (state) => state.companies.categoriesCompanySelected,
       productsCart: (state) => state.cart.products,
-      isAuthenticated: (state) => state.auth.isAuthenticated,
+      isAuthenticated: (state) => state.auth.authenticated,
       selectedTable: (state) => state.companies.selectedTable,
     }),
     filteredProducts() {
@@ -296,6 +296,8 @@ export default {
           name: "login",
           query: { redirect: this.$route.fullPath },
         });
+      } else {
+        this.$router.push({ name: "cart" });
       }
     },
 
