@@ -776,7 +776,7 @@ export default {
 
 .product-item {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   padding: 1.1rem 1.1rem;
   border-bottom: 1px solid #f0f0f0;
@@ -1002,6 +1002,13 @@ export default {
 
   .product-item:nth-child(odd) {
     border-right: 1px solid #f0f0f0;
+  }
+
+  /* Sem isso o texto (flex:1) estica ate a borda da coluna e a imagem
+     fica presa la na ponta, com um vao enorme no meio em telas largas */
+  .product-info {
+    flex: 0 1 420px;
+    max-width: 420px;
   }
 
   .calcadao-pattern {
