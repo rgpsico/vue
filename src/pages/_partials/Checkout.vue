@@ -35,7 +35,7 @@
             <strong>R$ {{ totalCart }}</strong>
           </div>
 
-          <template v-if="!isGuest">
+          <template v-if="!isGuest || adminUnlocked">
             <div class="form-group" v-if="tables.length > 0">
               <label for="tableSelect">Onde você está?</label>
               <select v-model="selectedTableIdentify" id="tableSelect" class="form-control">
@@ -184,6 +184,35 @@
               </p>
             </div>
 
+            <div class="admin-unlock">
+              <button
+                type="button"
+                class="admin-unlock-toggle"
+                @click="showAdminUnlock = !showAdminUnlock"
+              >
+                É da equipe da barraca? Desbloquear com a senha
+              </button>
+
+              <div v-if="showAdminUnlock" class="admin-unlock-form">
+                <input
+                  type="password"
+                  v-model="adminPassword"
+                  class="form-control"
+                  placeholder="Senha do administrador"
+                  @keyup.enter="unlockAsAdmin"
+                />
+                <p class="field-error" v-if="adminUnlockError">{{ adminUnlockError }}</p>
+                <button
+                  type="button"
+                  class="btn-unlock"
+                  :disabled="unlockingAdmin || !adminPassword"
+                  @click="unlockAsAdmin"
+                >
+                  {{ unlockingAdmin ? "Verificando..." : "Desbloquear" }}
+                </button>
+              </div>
+            </div>
+
             <router-link :to="{ name: 'login' }" class="btn-confirm">
               Fazer login
             </router-link>
@@ -211,6 +240,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
@@ -270,6 +300,13 @@ export default {
       expiryYear: "",
       cvv: "",
       tables: [],
+      // Desbloqueio pra equipe da barraca escolher o guarda-sol livremente
+      // sem precisar escanear o QR Code (ex: pedido feito no balcao)
+      adminUnlocked: false,
+      showAdminUnlock: false,
+      adminPassword: "",
+      unlockingAdmin: false,
+      adminUnlockError: "",
     };
   },
 
@@ -292,11 +329,50 @@ export default {
       }
     },
 
+    // Confirma a senha do admin da barraca (mesmo login do painel) sem
+    // manter sessao - so usada como prova de que quem esta escolhendo o
+    // guarda-sol e de confianca (equipe), nao um cliente qualquer.
+    unlockAsAdmin() {
+      this.adminUnlockError = "";
+      if (!this.adminPassword) return;
+
+      this.unlockingAdmin = true;
+
+      axios
+        .post("staff/login", {
+          email: this.company.contact,
+          password: this.adminPassword,
+          device_name: "checkout-verify",
+        })
+        .then((response) => {
+          this.adminUnlocked = true;
+          this.showAdminUnlock = false;
+          this.adminPassword = "";
+          this.$vToastify.success("Liberado! Escolha o guarda-sol.", "Pronto");
+
+          const token = response.data.token;
+          axios
+            .post(
+              "staff/logout",
+              {},
+              { headers: { Authorization: `Bearer ${token}` } }
+            )
+            .catch(() => {});
+        })
+        .catch(() => {
+          this.adminUnlockError = "Senha incorreta";
+        })
+        .finally(() => {
+          this.unlockingAdmin = false;
+        });
+    },
+
     createOrder() {
       // Pedido sem login so e permitido com guarda-sol vindo do QR Code
-      // escaneado - prova presenca fisica. Escolha manual numa lista
-      // deixaria qualquer um marcar o guarda-sol errado de proposito.
-      if (this.isGuest && !this.selectedTableFromQr) {
+      // escaneado (prova presenca fisica) ou com a senha do admin
+      // desbloqueando a escolha manual. Escolha manual livre sem nenhuma
+      // das duas deixaria qualquer um marcar o guarda-sol errado de proposito.
+      if (this.isGuest && !this.adminUnlocked && !this.selectedTableFromQr) {
         this.$vToastify.error(
           "Escaneie o QR Code do guarda-sol para continuar",
           "Erro"
@@ -667,6 +743,51 @@ textarea.form-control {
 
 .checkout-qr-hint p {
   font-size: 0.9rem;
+  margin: 0;
+}
+
+.admin-unlock {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-unlock-toggle {
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.admin-unlock-form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-unlock {
+  border: 1.5px solid #0a4d78;
+  background: #fff;
+  color: #0a4d78;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.btn-unlock:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.field-error {
+  color: #dc3545;
+  font-size: 0.78rem;
   margin: 0;
 }
 
