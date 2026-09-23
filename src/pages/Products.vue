@@ -45,18 +45,34 @@
           </button>
 
           <div class="table-picker-dropdown" v-if="showTablePicker && canPickTableFreely">
-            <p v-if="tables.length === 0" class="table-picker-empty">
-              Nenhum guarda-sol cadastrado nesta loja.
-            </p>
-            <button
-              v-for="table in tables"
-              :key="table.identify"
-              class="table-picker-option"
-              :class="{ active: selectedTable && selectedTable.identify === table.identify }"
-              @click="chooseTable(table)"
-            >
-              {{ table.name }}
-            </button>
+            <template v-if="pendingTableConfirm">
+              <p class="confirm-text">
+                Tem certeza que é o <strong>{{ pendingTableConfirm.name }}</strong>?
+              </p>
+              <div class="confirm-actions">
+                <button class="confirm-btn-cancel" @click="cancelTableChoice">
+                  Cancelar
+                </button>
+                <button class="confirm-btn-yes" @click="confirmTableChoice">
+                  Confirmar
+                </button>
+              </div>
+            </template>
+
+            <template v-else>
+              <p v-if="tables.length === 0" class="table-picker-empty">
+                Nenhum guarda-sol cadastrado nesta loja.
+              </p>
+              <button
+                v-for="table in tables"
+                :key="table.identify"
+                class="table-picker-option"
+                :class="{ active: selectedTable && selectedTable.identify === table.identify }"
+                @click="chooseTable(table)"
+              >
+                {{ table.name }}
+              </button>
+            </template>
           </div>
 
           <div class="table-picker-dropdown admin-unlock-dropdown" v-if="showAdminUnlock">
@@ -258,6 +274,9 @@ export default {
       adminPassword: "",
       unlockingAdmin: false,
       adminUnlockError: "",
+      // Guarda-sol clicado na lista, aguardando confirmacao antes de
+      // salvar de fato - evita trocar por engano com um toque so
+      pendingTableConfirm: null,
     };
   },
   computed: {
@@ -328,8 +347,17 @@ export default {
     },
 
     chooseTable(table) {
-      this.setSelectedTable(table);
+      this.pendingTableConfirm = table;
+    },
+
+    confirmTableChoice() {
+      this.setSelectedTable(this.pendingTableConfirm);
+      this.pendingTableConfirm = null;
       this.showTablePicker = false;
+    },
+
+    cancelTableChoice() {
+      this.pendingTableConfirm = null;
     },
 
     // Sem login (e sem senha do admin), abrir o badge nao mostra a lista
@@ -338,6 +366,7 @@ export default {
     toggleTablePicker() {
       if (this.canPickTableFreely) {
         this.showTablePicker = !this.showTablePicker;
+        this.pendingTableConfirm = null;
         return;
       }
       this.adminUnlockError = "";
@@ -693,6 +722,41 @@ export default {
   color: #6b7280;
   font-size: 0.85rem;
   text-align: center;
+}
+
+.confirm-text {
+  padding: 0.6rem 0.5rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.88rem;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 0.25rem 0.25rem;
+}
+
+.confirm-btn-cancel,
+.confirm-btn-yes {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.confirm-btn-cancel {
+  background: #f2f3f5;
+  color: #4b5563;
+}
+
+.confirm-btn-yes {
+  background: #ff6b35;
+  color: #fff;
 }
 
 .table-picker-option {
