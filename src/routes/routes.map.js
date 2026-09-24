@@ -8,6 +8,7 @@ import MyOrders from '@/pages/Auth/MyOrders'
 import DetailOrder from '@/pages/DetailOrder'
 import PageNotFound from '@/pages/PageNotFound'
 import Profile from '@/pages/Profile'
+import BarracaDigital from '@/pages/BarracaDigital'
 
 const routes = [
     {
@@ -82,6 +83,11 @@ const routes = [
             }
 
         ]
+    },
+    {
+        path: '/barraca-digital',
+        component: BarracaDigital,
+        name: 'barraca.digital'
     },
     {
         path: '*',
