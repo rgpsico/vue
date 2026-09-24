@@ -24,7 +24,7 @@
       <!-- Passo 0: Boas-vindas -->
       <div v-if="currentStep === 0" class="signup-step signup-welcome">
         <div class="welcome-icon">🏖️</div>
-        <h1 class="signup-title">Bem-vindo(a) ao PPGFood!</h1>
+        <h1 class="signup-title">Bem-vindo(a) ao Barraca Digital!</h1>
         <p class="signup-subtitle">
           Vamos criar o ambiente da sua barraca em poucos passos — leva menos
           de 1 minuto e você já cai direto no painel de pedidos.
