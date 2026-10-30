@@ -9,6 +9,8 @@ import DetailOrder from '@/pages/DetailOrder'
 import PageNotFound from '@/pages/PageNotFound'
 import Profile from '@/pages/Profile'
 import BarracaDigital from '@/pages/BarracaDigital'
+import axios from 'axios'
+import { API_VERSION } from '@/configs/api'
 
 const routes = [
     {
@@ -88,6 +90,21 @@ const routes = [
         path: '/barraca-digital',
         component: BarracaDigital,
         name: 'barraca.digital'
+    },
+    {
+        // Link curto da barraca: /barraca-do-rg abre /loja/barraca-do-rg.
+        // Se nao for o endereco de nenhuma barraca ativa, cai na pagina 404.
+        path: '/:companyFlag',
+        component: PageNotFound,
+        meta: { title: 'Página não encontrada' },
+        beforeEnter: (to, from, next) => {
+            axios.get(`${API_VERSION}/tenants`, { params: { per_page: 200 } })
+                .then(res => {
+                    const found = (res.data.data || []).some(t => t.flag === to.params.companyFlag)
+                    found ? next({ path: `/loja/${to.params.companyFlag}`, replace: true }) : next()
+                })
+                .catch(() => next())
+        }
     },
     {
         path: '*',
