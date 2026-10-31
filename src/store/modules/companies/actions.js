@@ -56,6 +56,20 @@ export default {
                         .then(response => response.data.data)
     },
 
+    // So busca quando a loja ligou o atendimento por funcionario
+    getAtendentesByCompany ({ commit, state }, token_company) {
+        if (!state.companySelected.atendimento || !state.companySelected.atendimento.habilitado) {
+            commit('SET_ATENDENTES', [])
+            return Promise.resolve([])
+        }
+
+        return axios.get(`${API_VERSION}/atendentes`, { params: { token_company } })
+                        .then(response => {
+                            commit('SET_ATENDENTES', response.data.data)
+                            return response.data.data
+                        })
+    },
+
     // Confirma a senha do admin da barraca (mesmo login do painel) pra
     // liberar a escolha manual do guarda-sol pra quem nao esta logado -
     // sem manter sessao, so serve como prova de identidade pontual.

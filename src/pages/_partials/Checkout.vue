@@ -35,6 +35,8 @@
             <strong>R$ {{ totalCart }}</strong>
           </div>
 
+          <AtendentePicker />
+
           <template v-if="!isGuest || adminUnlocked">
             <div class="form-group" v-if="tables.length > 0">
               <label for="tableSelect">Onde você está?</label>
@@ -241,8 +243,10 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
+import AtendentePicker from "@/components/AtendentePicker.vue";
 
 export default {
+  components: { AtendentePicker },
   computed: {
     ...mapState({
       products: (state) => state.cart.products,
@@ -250,6 +254,7 @@ export default {
       company: (state) => state.companies.companySelected,
       selectedTableFromQr: (state) => state.companies.selectedTableFromQr,
       adminUnlocked: (state) => state.companies.adminUnlocked,
+      selectedAtendente: (state) => state.companies.selectedAtendente,
     }),
 
     totalCart() {
@@ -366,6 +371,13 @@ export default {
         return;
       }
 
+      // Atendente obrigatorio: barra aqui, mas quem decide de verdade e o backend (valida de novo)
+      const atendimento = this.company.atendimento || {};
+      if (atendimento.habilitado && atendimento.obrigatorio && !this.selectedAtendente) {
+        this.$vToastify.error("Escolha quem está atendendo você", "Atenção");
+        return;
+      }
+
       this.loading = true;
 
       const asaasKey = localStorage.getItem("asaas_key");
@@ -378,6 +390,10 @@ export default {
         value: this.totalCart,
         products: [...this.products],
         table: this.selectedTableIdentify || undefined,
+        attendant:
+          atendimento.habilitado && this.selectedAtendente
+            ? this.selectedAtendente.identify
+            : undefined,
       };
 
       if (this.paymentMethod === "pix") {
@@ -454,7 +470,7 @@ export default {
           })
           .catch((error) => {
             console.error("Erro ao criar pedido:", error);
-            this.$vToastify.error("Erro ao criar pedido", "Erro");
+            this.$vToastify.error(this.orderErrorMessage(error), "Erro");
           })
           .finally(() => {
             this.loading = false;
@@ -485,6 +501,16 @@ export default {
 
       const data = await response.json();
       return data.pixQrCode;
+    },
+
+    // Mostra o motivo que o backend deu (ex.: atendente indisponivel) em vez de um erro generico
+    orderErrorMessage(error) {
+      const errors = error && error.response && error.response.data && error.response.data.errors;
+      if (errors) {
+        const first = errors.attendant || errors.table;
+        if (first && first.length) return first[0];
+      }
+      return "Erro ao criar pedido";
     },
 
     openModalCheckout() {

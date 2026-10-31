@@ -1,4 +1,22 @@
 
+// Atendente escolhido fica so na sessao da aba (sessionStorage), por loja e com validade curta:
+// aparelho compartilhado nao herda o atendente de outro cliente.
+const ATENDENTE_KEY = 'selected_attendant'
+const ATENDENTE_TTL_MS = 4 * 60 * 60 * 1000
+
+function restoreAtendente(company) {
+    const memorizar = company.atendimento && company.atendimento.memorizar
+    if (!memorizar) return null
+
+    try {
+        const saved = JSON.parse(sessionStorage.getItem(ATENDENTE_KEY) || 'null')
+        const valid = saved && saved.companyUuid === company.uuid && (Date.now() - saved.savedAt) < ATENDENTE_TTL_MS
+        return valid ? { identify: saved.identify, name: saved.name } : null
+    } catch (e) {
+        return null
+    }
+}
+
 export default {
     SET_COMPANIES(state,companies) {
         state.items = companies
@@ -12,6 +30,13 @@ export default {
            }
 
            state.companySelected = Object.assign(state.companySelected, company)
+
+           // Lojas sem o modulo (ou API antiga) nao mandam "atendimento": volta pro padrao desligado
+           if (!company.atendimento) {
+             state.companySelected.atendimento = Object.assign({}, state.companySelected.atendimento, { habilitado: false })
+           }
+           state.atendentes = []
+           state.selectedAtendente = restoreAtendente(company)
 
            // Recupera o guarda-sol/cadeira salvo, mas so se for da mesma loja -
            // trocar de loja nao deve manter o local selecionado da loja anterior
@@ -74,6 +99,36 @@ export default {
 
     SET_ADMIN_UNLOCKED (state, value) {
         state.adminUnlocked = value
+    },
+
+    // Lista vinda da API (so ativos). Se o atendente escolhido saiu da lista (desativado), descarta.
+    SET_ATENDENTES (state, atendentes) {
+        state.atendentes = atendentes
+        const sel = state.selectedAtendente
+        if (sel && !atendentes.some((a) => a.identify === sel.identify)) {
+            state.selectedAtendente = null
+            try { sessionStorage.removeItem(ATENDENTE_KEY) } catch (e) { /* sem storage: segue */ }
+        }
+    },
+
+    SET_SELECTED_ATENDENTE (state, atendente) {
+        state.selectedAtendente = atendente ? { identify: atendente.identify, name: atendente.name } : null
+
+        try {
+            const memorizar = state.companySelected.atendimento && state.companySelected.atendimento.memorizar
+            if (atendente && memorizar) {
+                sessionStorage.setItem(ATENDENTE_KEY, JSON.stringify({
+                    companyUuid: state.companySelected.uuid,
+                    identify: atendente.identify,
+                    name: atendente.name,
+                    savedAt: Date.now(),
+                }))
+            } else {
+                sessionStorage.removeItem(ATENDENTE_KEY)
+            }
+        } catch (e) {
+            // sessionStorage indisponivel - a escolha vale so na memoria
+        }
     }
 
 }

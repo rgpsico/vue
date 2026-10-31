@@ -100,6 +100,9 @@
             </button>
           </div>
         </div>
+
+        <!-- Quem esta atendendo (so aparece se a empresa ligou o atendimento por funcionario) -->
+        <AtendentePicker />
       </div>
     </header>
 
@@ -255,8 +258,10 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import axios from "axios";
 import { API_VERSION } from "@/configs/api";
 import calcadaoPattern from "@/assets/imgs/calcadao-pattern.webp";
+import AtendentePicker from "@/components/AtendentePicker.vue";
 
 export default {
+  components: { AtendentePicker },
   props: ["companyFlag", "tenantUuid", "tableUuid"],
   data() {
     return {
@@ -325,6 +330,7 @@ export default {
       "getCategoriesByCompany",
       "getProductsByCompany",
       "getTablesByCompany",
+      "getAtendentesByCompany",
       "unlockAdmin",
     ]),
     ...mapMutations({
@@ -336,6 +342,16 @@ export default {
       setSelectedTable: "SET_SELECTED_TABLE",
       setSelectedTableFromQr: "SET_SELECTED_TABLE_FROM_QR",
     }),
+
+    // Falha aqui nao pode travar o cardapio: sem lista, a escolha do atendente simplesmente nao aparece
+    async loadAtendentes() {
+      if (!this.company.uuid) return;
+      try {
+        await this.getAtendentesByCompany(this.company.uuid);
+      } catch (error) {
+        // segue sem atendentes
+      }
+    },
 
     async loadTables() {
       if (!this.company.uuid) return;
@@ -454,6 +470,7 @@ export default {
         await this.getCategoriesByCompany(this.company.uuid);
         await this.loadProducts();
         await this.loadTables();
+        await this.loadAtendentes();
       } catch (error) {
         this.$vToastify.error("Falha ao carregar dados", "Erro");
       }
