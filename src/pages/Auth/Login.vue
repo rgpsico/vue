@@ -16,31 +16,25 @@
 
            
 
-    <div class="text-danger" v-if="errors.email != '' ">
-              {{errors.email[0] || '' }}
-
-             </div>
-            <div class="input-group">
-              
-              <div class="input-group-append">
-                
-                <span class="input-group-text">
-                  <i class="fas fa-envelope"></i></span>
-               
-              </div>
-              
-              <input 
-              type="email" 
-              v-model="formData.email" 
-              name="email" 
-              :class="['form-control', 'input_user', {'is-invalid' : errors.email != '' }]"
-              value="" 
-              placeholder="E-mail">
+    <div class="text-danger" v-if="errors.login != '' ">
+              {{errors.login[0] || '' }}
             </div>
+            <div class="input-group">
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="fas fa-phone"></i></span>
+              </div>
+              <input
+              type="text"
+              inputmode="tel"
+              v-model="formData.login"
+              name="login"
+              autocomplete="username"
+              :class="['form-control', 'input_user', {'is-invalid' : errors.login != '' }]"
+              placeholder="Seu celular com DDD">
+            </div>
+            <p style="font-size:12px;color:#777;margin:-6px 0 10px;text-align:center">Conta antiga? Pode usar o e-mail.</p>
 
-            
-
-            
            
            
             <div class="text-danger" v-if="errors.password != '' ">
@@ -96,18 +90,18 @@
   export default {
     computed: {
       deviceName() {
-        return navigator.appCodeName + navigator.appName + navigator.platform + this.formData.email
+        return navigator.appCodeName + navigator.appName + navigator.platform + this.formData.login
       }
     },
     data(){
       return {
         loading: false,
         formData: {
-          email:'',
+          login:'',
           password:''
         },
         errors: {
-          email:'',
+          login:'',
           password: '',
 
         }
@@ -158,7 +152,7 @@
       },
       reset() {
         this.errors = {
-          email:'',
+          login:'',
           password:''
 
         }

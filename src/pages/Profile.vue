@@ -66,7 +66,7 @@
             <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">
               {{ me.name }}
             </h1>
-            <p class="text-amber-100 text-base sm:text-lg mb-3">
+            <p v-if="me.email" class="text-amber-100 text-base sm:text-lg mb-3">
               {{ me.email }}
             </p>
             <div
@@ -85,10 +85,9 @@
 
       <!-- Informações adicionais -->
       <div class="p-6 space-y-4">
-        <p><strong>Telefone:</strong> {{ me.telefone || "Não informado" }}</p>
-        <p><strong>Endereço:</strong> {{ me.endereco || "Não informado" }}</p>
-        <p><strong>Instagram:</strong> {{ me.instagran || "Não informado" }}</p>
-        <p><strong>Asaas Key:</strong> {{ me.asaas_key || "Não informado" }}</p>
+        <p><strong>Celular:</strong> {{ me.telefone || "Não informado" }}</p>
+        <p v-if="me.endereco"><strong>Endereço:</strong> {{ me.endereco }}</p>
+        <p v-if="me.instagran"><strong>Instagram:</strong> {{ me.instagran }}</p>
       </div>
 
       <!-- Botões -->

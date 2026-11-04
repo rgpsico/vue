@@ -16,135 +16,41 @@
         </div>
         <div class="d-flex justify-content-center form_container">
           <form @submit.prevent="registerClient">
+            <p class="register-hint">Só 3 informações e você já pode pedir.</p>
+
             <div class="text-danger" v-if="errors.name != ''">
               {{ errors.name[0] || "" }}
             </div>
-
             <div class="input-group">
               <div class="input-group-append">
-                <span class="input-group-text">
-                  <i class="fas fa-user"></i>
-                </span>
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
               </div>
-
               <input
                 type="text"
                 v-model="formData.name"
                 name="name"
-                :class="[
-                  'form-control',
-                  'input_user',
-                  { 'is-invalid': errors.name != '' },
-                ]"
-                value=""
-                placeholder="Nome"
+                autocomplete="name"
+                autocapitalize="words"
+                :class="['form-control', 'input_user', { 'is-invalid': errors.name != '' }]"
+                placeholder="Seu nome"
               />
             </div>
 
-            <div class="text-danger" v-if="errors.cpf != ''">
-              {{ errors.cpf[0] || "" }}
+            <div class="text-danger" v-if="errors.telefone != ''">
+              {{ errors.telefone[0] || "" }}
             </div>
             <div class="input-group">
               <div class="input-group-append">
-                <span class="input-group-text"
-                  ><i class="fas fa-id-card"></i
-                ></span>
+                <span class="input-group-text"><i class="fas fa-phone"></i></span>
               </div>
               <input
-                type="text"
-                v-model="formData.cpf"
-                name="cpf"
-                :class="[
-                  'form-control',
-                  'input_user',
-                  { 'is-invalid': errors.cpf != '' },
-                ]"
-                value=""
-                placeholder="CPF"
-              />
-            </div>
-
-            <div class="text-danger" v-if="errors.email != ''">
-              {{ errors.email[0] || "" }}
-            </div>
-            <div class="input-group">
-              <div class="input-group-append">
-                <span class="input-group-text"
-                  ><i class="fas fa-envelope"></i
-                ></span>
-              </div>
-
-              <input
-                type="email"
-                v-model="formData.email"
-                name="email"
-                :class="[
-                  'form-control',
-                  'input_user',
-                  { 'is-invalid': errors.email != '' },
-                ]"
-                value=""
-                placeholder="E-mail"
-              />
-            </div>
-
-            <div class="input-group">
-              <div class="input-group-append">
-                <span class="input-group-text"
-                  ><i class="far fa-address-card"></i
-                ></span>
-              </div>
-              <input
-                type="text"
-                v-model="formData.endereco"
-                name="endereco"
-                :class="[
-                  'form-control',
-                  'input_user',
-                  { 'is-invalid': errors.endereco != '' },
-                ]"
-                value=""
-                placeholder="Endereço Completo"
-              />
-            </div>
-
-            <div class="input-group">
-              <div class="input-group-append">
-                <span class="input-group-text"
-                  ><i class="fas fa-phone"></i
-                ></span>
-              </div>
-              <input
-                type="text"
+                type="tel"
+                inputmode="tel"
                 v-model="formData.telefone"
                 name="telefone"
-                :class="[
-                  'form-control',
-                  'input_user',
-                  { 'is-invalid': errors.telefone != '' },
-                ]"
-                value=""
-                placeholder="Telefone"
-              />
-            </div>
-
-            <div class="input-group">
-              <div class="input-group-append">
-                <span class="input-group-text"
-                  ><i class="fab fa-instagram-square"></i
-                ></span>
-              </div>
-              <input
-                type="text"
-                v-model="formData.instagran"
-                name="instagran"
-                :class="[
-                  'form-control',
-                  'input_user',
-                  { 'is-invalid': errors.instagran != '' },
-                ]"
-                value=""
-                placeholder="@Instagram"
+                autocomplete="tel"
+                :class="['form-control', 'input_user', { 'is-invalid': errors.telefone != '' }]"
+                placeholder="Celular com DDD"
               />
             </div>
 
@@ -156,24 +62,22 @@
                 <span class="input-group-text"><i class="fas fa-key"></i></span>
               </div>
               <input
-                type="password"
+                :type="mostrarSenha ? 'text' : 'password'"
                 v-model="formData.password"
                 name="password"
-                :class="[
-                  'form-control',
-                  'input_user',
-                  { 'is-invalid': errors.password != '' },
-                ]"
-                placeholder="Senha"
+                autocomplete="new-password"
+                :class="['form-control', 'input_user', { 'is-invalid': errors.password != '' }]"
+                placeholder="Escolha uma senha (mín. 4)"
               />
+              <div class="input-group-append" @click="mostrarSenha = !mostrarSenha" style="cursor: pointer">
+                <span class="input-group-text">
+                  <i :class="mostrarSenha ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </span>
+              </div>
             </div>
+
             <div class="d-flex justify-content-center login_container">
-              <button
-                type="submit"
-                name="button"
-                class="btn login_btn"
-                :disabled="loading"
-              >
+              <button type="submit" name="button" class="btn login_btn" :disabled="loading">
                 <span v-if="loading">Cadastrando</span>
                 <span v-else>Cadastrar</span>
               </button>
@@ -203,22 +107,15 @@ export default {
   data() {
     return {
       loading: false,
+      mostrarSenha: false,
       formData: {
         name: "",
-        cpf: "",
-        email: "",
-        endereco: "",
         telefone: "",
-        instagran: "",
         password: "",
       },
       errors: {
         name: "",
-        cpf: "",
-        email: "",
-        endereco: "",
         telefone: "",
-        instagran: "",
         password: "",
       },
     };
@@ -257,11 +154,7 @@ export default {
     reset() {
       this.errors = {
         name: "",
-        cpf: "",
-        email: "",
-        endereco: "",
         telefone: "",
-        instagran: "",
         password: "",
       };
     },
@@ -270,5 +163,9 @@ export default {
 </script>
 
 <style>
-/* Adicione aqui qualquer estilo adicional, se precisar */
+.register-hint {
+  text-align: center;
+  margin-bottom: 14px;
+  color: #555;
+}
 </style>

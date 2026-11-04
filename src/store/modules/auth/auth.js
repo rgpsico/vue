@@ -41,7 +41,7 @@ export default {
                 .then(() => {
                     // Após registrar, autentica o usuário automaticamente
                     const loginParams = {
-                        email: params.email,
+                        login: params.telefone,
                         password: params.password,
                         device_name: 'web', // Inclui o device_name para o login
                     };
