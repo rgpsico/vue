@@ -44,11 +44,14 @@
           >
             <div class="restaurant-card" @click="goStoreCompany(company)">
               <div class="card-image-container">
+                <!-- capa da barraca; sem capa usa o logo; se a imagem quebrar cai no padrao -->
                 <img
-                  v-if="company.image"
+                  v-if="(company.cover_image || company.image) && !company.imagem_quebrada"
                   class="card-image"
-                  :src="company.image"
+                  :src="company.cover_image || company.image"
                   :alt="company.name"
+                  loading="lazy"
+                  @error="$set(company, 'imagem_quebrada', true)"
                 />
                 <div v-else class="card-image card-image-placeholder">
                   <img
